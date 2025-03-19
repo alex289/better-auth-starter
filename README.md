@@ -2,12 +2,6 @@
 
 ## TODO
 
-GeneralL
-
-- next config
-- tsconfig
-- Check drizzle setup
-
 Auth:
 
 - Email and Password auth
