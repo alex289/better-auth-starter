@@ -4,7 +4,6 @@
 
 GeneralL
 
-- Eslint
 - next config
 - tsconfig
 - Check drizzle setup
