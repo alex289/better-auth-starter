@@ -5,16 +5,14 @@
 GeneralL
 
 - Eslint
-- Prettier
 - next config
 - tsconfig
 - Check drizzle setup
 
 Auth:
 
-- Rate limiting
-- Email
 - Email and Password auth
+- Email
 - two factor auth
 - email otp
 - passkey
@@ -22,4 +20,5 @@ Auth:
 - api key
 - organization
 - captcha
+- Rate limiting
 - stripe?
