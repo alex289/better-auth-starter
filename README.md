@@ -4,8 +4,6 @@
 
 Auth:
 
-- Email and Password auth
-- Email
 - two factor auth
 - email otp
 - passkey

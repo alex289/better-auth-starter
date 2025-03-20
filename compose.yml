@@ -1,5 +1,6 @@
 services:
   db:
+    name: db
     image: postgres:latest
     restart: unless-stopped
     ports:
