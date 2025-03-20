@@ -11,5 +11,4 @@ Auth:
 - api key
 - organization
 - captcha
-- Rate limiting
 - stripe?
