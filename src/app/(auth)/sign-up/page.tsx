@@ -79,6 +79,8 @@ export default function SignUpPage() {
       image: values.image.length > 0 ? values.image : undefined,
     });
 
+    setLoading(false);
+
     if (res.error) {
       toast.error('Failed to sign-up', {
         description: res.error.message,
@@ -86,7 +88,6 @@ export default function SignUpPage() {
       return;
     }
 
-    setLoading(false);
     setSuccess(true);
   }
 
