@@ -9,6 +9,7 @@ Auth:
 - passkey
 - admin panel
 - api key
+- multi sessions?
 - organization
 - captcha
 - stripe?
