@@ -113,7 +113,6 @@ export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<'passkey' | 'password' | null>(null);
   const form = useForm<z.infer<typeof signInSchema>>({
-    // @ts-expect-error - TODO: fix zodResolver
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',

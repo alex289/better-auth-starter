@@ -55,7 +55,6 @@ export default function SignUpPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof signUpSchema>>({
-    // @ts-expect-error - TODO: fix zodResolver
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: '',
