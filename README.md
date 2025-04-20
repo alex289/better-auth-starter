@@ -4,9 +4,9 @@
 
 Auth:
 
+- user settings
 - two factor auth
-- email otp
 - admin panel
 - organization
 - captcha
-- stripe?
+- stripe/polar?
