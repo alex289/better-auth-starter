@@ -15,6 +15,13 @@
       "when": 1745168633953,
       "tag": "0001_sturdy_gravity",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745170582053,
+      "tag": "0002_flimsy_chat",
+      "breakpoints": true
     }
   ]
 }

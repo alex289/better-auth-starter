@@ -218,7 +218,7 @@ export function SecuritySettings({
                         {passkey.name ?? 'Passkey ' + (index + 1)}
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        Added on {passkey.createdAt.toLocaleDateString()}
+                        Added on {passkey.createdAt.toLocaleDateString('de-DE')}
                       </p>
                     </div>
                   </div>

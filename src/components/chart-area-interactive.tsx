@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Card,
   CardAction,
@@ -26,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const description = 'An interactive area chart';
 
@@ -243,10 +243,7 @@ export function ChartAreaInteractive() {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
+                return date.toLocaleDateString('de-DE');
               }}
             />
             <ChartTooltip
@@ -255,10 +252,7 @@ export function ChartAreaInteractive() {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    });
+                    return new Date(value).toLocaleDateString('de-DE');
                   }}
                   indicator="dot"
                 />
