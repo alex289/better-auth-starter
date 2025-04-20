@@ -14,9 +14,80 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { authClient } from '@/lib/auth-client';
+import { Session } from 'better-auth';
+import { Passkey } from 'better-auth/plugins/passkey';
+import { formatDistanceToNow } from 'date-fns';
 import { AlertCircle, Check, KeyRound, Shield, Smartphone } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
-export function SecuritySettings() {
+export function SecuritySettings({
+  passkeys,
+  sessions,
+  currentSession,
+}: {
+  passkeys: Passkey[];
+  sessions: Session[];
+  currentSession: Session;
+}) {
+  const router = useRouter();
+
+  async function addPasskey() {
+    const res = await authClient.passkey.addPasskey();
+
+    if (res?.error) {
+      toast.error('Failed to add passkey', {
+        description: res.error.message,
+      });
+      return;
+    }
+
+    router.refresh();
+  }
+
+  async function removePasskey(passkey: Passkey) {
+    const res = await authClient.passkey.deletePasskey({
+      id: passkey.id,
+    });
+
+    if (res?.error) {
+      toast.error('Failed delete passkey', {
+        description: res.error.message,
+      });
+      return;
+    }
+
+    router.refresh();
+  }
+
+  async function removeSession(session: Session) {
+    const res = await authClient.revokeSession({
+      token: session.token,
+    });
+
+    if (res?.error) {
+      toast.error('Failed revoke session', {
+        description: res.error.message,
+      });
+      return;
+    }
+
+    router.refresh();
+  }
+
+  async function revokeAllOtherSessions() {
+    const res = await authClient.revokeOtherSessions();
+
+    if (res?.error) {
+      toast.error('Failed revoke all other sessions', {
+        description: res.error.message,
+      });
+      return;
+    }
+
+    router.refresh();
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -133,42 +204,38 @@ export function SecuritySettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <KeyRound className="text-primary h-5 w-5" />
+              {passkeys.length === 0 ? <p>No passkeys added yet.</p> : null}
+              {passkeys.map((passkey, index) => (
+                <div
+                  key={passkey.id}
+                  className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary/10 rounded-full p-2">
+                      <KeyRound className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">
+                        {passkey.name ?? 'Passkey ' + (index + 1)}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        Added on {passkey.createdAt.toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium">MacBook Pro Touch ID</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Added on Apr 15, 2023
-                    </p>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive"
+                    onClick={async () => await removePasskey(passkey)}>
+                    Remove
+                  </Button>
                 </div>
-                <Button variant="ghost" size="sm" className="text-destructive">
-                  Remove
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <KeyRound className="text-primary h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">iPhone Face ID</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Added on Jan 12, 2023
-                    </p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" className="text-destructive">
-                  Remove
-                </Button>
-              </div>
+              ))}
             </CardContent>
             <CardFooter>
-              <Button className="w-full">
+              <Button
+                className="w-full"
+                onClick={async () => await addPasskey()}>
                 <Shield className="mr-2 h-4 w-4" />
                 Add New Passkey
               </Button>
@@ -185,71 +252,51 @@ export function SecuritySettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="rounded-full bg-green-100 p-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Current Session</h3>
-                    <p className="text-muted-foreground text-sm">
-                      MacBook Pro • San Francisco, CA
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Last active: Just now
-                    </p>
+              {sessions.map((session, index) => (
+                <div
+                  key={session.token}
+                  className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {session.token === currentSession.token ? (
+                      <div className="rounded-full bg-green-100 p-2">
+                        <Check className="h-4 w-4 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="bg-primary/10 rounded-full p-2">
+                        <Smartphone className="text-primary h-4 w-4" />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-medium">
+                        {session.token === currentSession.token
+                          ? 'Current Session'
+                          : (session.ipAddress ?? 'Session ' + (index + 1))}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        {session.userAgent}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Last active: {formatDistanceToNow(session.updatedAt)}
+                      </p>
+                    </div>
+                    {session.token !== currentSession.token ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive"
+                        onClick={async () => await removeSession(session)}>
+                        Revoke
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <Smartphone className="text-primary h-4 w-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">iPhone 13 Pro</h3>
-                    <p className="text-muted-foreground text-sm">
-                      iOS 16 • San Francisco, CA
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Last active: 2 hours ago
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive">
-                    Logout
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <Smartphone className="text-primary h-4 w-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">iPad Pro</h3>
-                    <p className="text-muted-foreground text-sm">
-                      iPadOS • New York, NY
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Last active: 5 days ago
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive">
-                    Logout
-                  </Button>
-                </div>
-              </div>
+              ))}
             </CardContent>
             <CardFooter>
-              <Button variant="destructive" className="w-full">
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={async () => await revokeAllOtherSessions()}>
                 Logout of All Other Sessions
               </Button>
             </CardFooter>
