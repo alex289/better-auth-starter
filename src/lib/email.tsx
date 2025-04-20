@@ -28,9 +28,9 @@ export async function sendForgotPasswordEmail(
   );
 
   const options = {
-    from: `"Do-It" <${process.env.SMTP_USER}>`,
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Do-It - Change your password',
+    subject: 'Better-Auth-Starter - Change your password',
     html: emailHtml,
   };
 
@@ -51,9 +51,9 @@ export async function verifyEmail(
   );
 
   const options = {
-    from: `"Do-It" <${process.env.SMTP_USER}>`,
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Do-It - Verify your email',
+    subject: 'Better-Auth-Starter - Verify your email',
     html: emailHtml,
   };
 
@@ -74,9 +74,9 @@ export async function changeEmail(
   );
 
   const options = {
-    from: `"Do-It" <${process.env.SMTP_USER}>`,
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Do-It - Verify your email',
+    subject: 'Better-Auth-Starter - Verify your email',
     html: emailHtml,
   };
 
@@ -97,9 +97,9 @@ export async function deleteAccountEmail(
   );
 
   const options = {
-    from: `"Do-It" <${process.env.SMTP_USER}>`,
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Do-It - Delete your account',
+    subject: 'Better-Auth-Starter - Delete your account',
     html: emailHtml,
   };
 

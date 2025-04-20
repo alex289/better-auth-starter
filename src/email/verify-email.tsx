@@ -31,7 +31,7 @@ function VerifyEmail({ url, username, baseUrl }: VerifyEmailProps) {
               <Img
                 src={`${baseUrl}/static/icon.png`}
                 height="50"
-                alt="Do-It"
+                alt="Better-Auth-Starter"
                 className="mx-auto my-0"
               />
             </Section>

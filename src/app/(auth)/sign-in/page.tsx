@@ -37,7 +37,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { authClient } from '@/lib/auth-client';
 
 const signInSchema = z.object({
@@ -46,13 +45,23 @@ const signInSchema = z.object({
   rememberMe: z.boolean(),
 });
 
-// TODO: Replace with real form content
+const resetPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
 function ForgotPasswordDialog() {
   const [loading, setLoading] = useState(false);
-  async function submit() {
+  const form = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
     setLoading(true);
     const { error } = await authClient.forgetPassword({
-      email: 'me@alexanderkonietzko.com',
+      email: values.email,
       redirectTo: '/reset-password',
     });
 
@@ -82,29 +91,39 @@ function ForgotPasswordDialog() {
             Enter your email address and we will send you a password reset link.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="email" className="text-right">
-              Email
-            </Label>
-            <Input
-              id="email"
-              placeholder="max@mustermann.com"
-              className="col-span-3"
+        <Form {...form}>
+          <form className="grid gap-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="max@mustermann.com"
+                      type="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            disabled={loading}
-            onClick={submit}
-            className="cursor-pointer">
-            {loading ? (
-              <Spinner className="text-white dark:text-black" />
-            ) : null}
-            Request password reset
-          </Button>
-        </DialogFooter>
+            <DialogFooter>
+              <Button
+                disabled={loading}
+                className="cursor-pointer"
+                type="button"
+                onClick={form.handleSubmit(onSubmit)}>
+                {loading ? (
+                  <Spinner className="text-white dark:text-black" />
+                ) : null}
+                Request password reset
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
