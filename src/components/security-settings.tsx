@@ -307,6 +307,7 @@ export function SecuritySettings({
           </Card>
         </TabsContent>
 
+        {/* TODO: Add name to passkey */}
         <TabsContent value="passkeys" className="space-y-4">
           <Card>
             <CardHeader>
@@ -355,6 +356,7 @@ export function SecuritySettings({
           </Card>
         </TabsContent>
 
+        {/* TODO: Improve session name */}
         <TabsContent value="sessions" className="space-y-4">
           <Card>
             <CardHeader>

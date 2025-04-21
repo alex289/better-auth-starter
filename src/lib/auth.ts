@@ -36,6 +36,12 @@ export const auth = betterAuth({
   rateLimit: {
     storage: 'secondary-storage',
   },
+  session: {
+    cookieCache: {
+      enabled: process.env.NODE_ENV === 'production',
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
+  },
   plugins: [
     passkey(),
     haveIBeenPwned(),
