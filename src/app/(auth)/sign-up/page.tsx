@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
+import { convertImageToBase64 } from '@/lib/utils';
 
 const signUpSchema = z
   .object({
@@ -41,15 +42,6 @@ const signUpSchema = z
     message: "Passwords don't match",
     path: ['confirmPassword'],
   });
-
-async function convertImageToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 export default function SignUpPage() {
   const [success, setSuccess] = useState(false);

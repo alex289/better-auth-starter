@@ -141,7 +141,7 @@ export function ApiKeysSettings({
         </div>
         <Dialog open={showNewKeyDialog} onOpenChange={setShowNewKeyDialog}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="cursor-pointer">
               <Plus className="mr-2 h-4 w-4" />
               Create API Key
             </Button>
@@ -247,10 +247,14 @@ export function ApiKeysSettings({
                         disabled={loading}
                         type="button"
                         variant="outline"
+                        className="cursor-pointer"
                         onClick={() => setShowNewKeyDialog(false)}>
                         Cancel
                       </Button>
-                      <Button disabled={loading} type="submit">
+                      <Button
+                        disabled={loading}
+                        type="submit"
+                        className="cursor-pointer">
                         {loading ? (
                           <Spinner className="text-white dark:text-black" />
                         ) : null}

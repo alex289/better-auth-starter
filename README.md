@@ -4,7 +4,6 @@
 
 Auth:
 
-- user settings
 - two factor auth
 - admin panel
 - organization

@@ -12,15 +12,45 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/auth-client';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Session } from 'better-auth';
 import { Passkey } from 'better-auth/plugins/passkey';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertCircle, Check, KeyRound, Shield, Smartphone } from 'lucide-react';
+import {
+  AlertCircle,
+  Check,
+  KeyRound,
+  LogOut,
+  Shield,
+  Smartphone,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { z } from 'zod';
+import { Spinner } from './spinner';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from './ui/form';
+
+const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(8),
+    newPassword: z.string().min(8),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 export function SecuritySettings({
   passkeys,
@@ -32,6 +62,15 @@ export function SecuritySettings({
   currentSession: Session;
 }) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const form = useForm<z.infer<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
   async function addPasskey() {
     const res = await authClient.passkey.addPasskey();
@@ -88,6 +127,28 @@ export function SecuritySettings({
 
     router.refresh();
   }
+
+  async function submitPasswordChange(
+    values: z.infer<typeof changePasswordSchema>,
+  ) {
+    setLoading(true);
+    const res = await authClient.changePassword({
+      currentPassword: values.oldPassword,
+      newPassword: values.newPassword,
+    });
+
+    setLoading(false);
+
+    if (res?.error) {
+      toast.error('Failed to change password', {
+        description: res.error.message,
+      });
+      return;
+    }
+
+    toast.success('Password changed successfully');
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -113,23 +174,74 @@ export function SecuritySettings({
                 Update your password to keep your account secure.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                <Input id="confirm-password" type="password" />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button>Update Password</Button>
-            </CardFooter>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(submitPasswordChange)}>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="oldPassword"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Current Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Password"
+                            type="password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Password"
+                            type="password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Confirm new Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Confirm Password"
+                            type="password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-4 cursor-pointer">
+                    {loading ? (
+                      <Spinner className="text-white dark:text-black" />
+                    ) : null}
+                    Change Password
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
           </Card>
         </TabsContent>
 
@@ -225,7 +337,7 @@ export function SecuritySettings({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-destructive"
+                    className="text-destructive cursor-pointer"
                     onClick={async () => await removePasskey(passkey)}>
                     Remove
                   </Button>
@@ -234,7 +346,7 @@ export function SecuritySettings({
             </CardContent>
             <CardFooter>
               <Button
-                className="w-full"
+                className="cursor-pointer"
                 onClick={async () => await addPasskey()}>
                 <Shield className="mr-2 h-4 w-4" />
                 Add New Passkey
@@ -295,8 +407,9 @@ export function SecuritySettings({
             <CardFooter>
               <Button
                 variant="destructive"
-                className="w-full"
+                className="cursor-pointer"
                 onClick={async () => await revokeAllOtherSessions()}>
+                <LogOut className="mr-2 h-4 w-4" />
                 Logout of All Other Sessions
               </Button>
             </CardFooter>
