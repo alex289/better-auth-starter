@@ -2,7 +2,9 @@
 
 ## TODO
 
-- two factor auth
+- 2fa:
+  - sign in with 2fa
+  - backup codes
 - admin panel
 - organization
 - captcha

@@ -29,6 +29,20 @@
       "when": 1745262757321,
       "tag": "0003_high_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745263167918,
+      "tag": "0004_lumpy_pretty_boy",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745351590070,
+      "tag": "0005_sticky_leo",
+      "breakpoints": true
     }
   ]
 }

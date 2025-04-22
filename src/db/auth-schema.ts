@@ -17,28 +17,9 @@ export const user = pgTable(
     image: text('image'),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
+    twoFactorEnabled: boolean('two_factor_enabled'),
   },
   (table) => [index('user_email_idx').on(table.email)],
-);
-
-export const session = pgTable(
-  'session',
-  {
-    id: text('id').primaryKey(),
-    expiresAt: timestamp('expires_at').notNull(),
-    token: text('token').notNull().unique(),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').notNull(),
-    ipAddress: text('ip_address'),
-    userAgent: text('user_agent'),
-    userId: text('user_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-  },
-  (table) => [
-    index('session_userId_idx').on(table.userId),
-    index('session_token_idx').on(table.token),
-  ],
 );
 
 export const account = pgTable(
@@ -120,3 +101,16 @@ export const apikey = pgTable('apikey', {
   permissions: text('permissions'),
   metadata: text('metadata'),
 });
+
+export const twoFactor = pgTable(
+  'two_factor',
+  {
+    id: text('id').primaryKey(),
+    secret: text('secret').notNull(),
+    backupCodes: text('backup_codes').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+  },
+  (table) => [index('two_factor_secret_idx').on(table.secret)],
+);

@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { apiKey, haveIBeenPwned } from 'better-auth/plugins';
+import { apiKey, haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
 import { createClient } from 'redis';
 import {
@@ -17,6 +17,7 @@ const redis = createClient({
 await redis.connect();
 
 export const auth = betterAuth({
+  appName: 'Better Auth Starter',
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
@@ -46,6 +47,7 @@ export const auth = betterAuth({
     passkey(),
     haveIBeenPwned(),
     apiKey(),
+    twoFactor(),
     // captcha({
     //   provider: 'google-recaptcha',
     //   secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,

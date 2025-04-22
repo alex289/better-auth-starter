@@ -25,6 +25,7 @@ export default async function Page() {
         passkeys={passkeys}
         sessions={sessions}
         currentSession={currentSession.session}
+        twoFactorEnabled={currentSession.user.twoFactorEnabled ?? false}
       />
     </div>
   );

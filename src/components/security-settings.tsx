@@ -31,6 +31,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { DisableTwoFactorDialog } from './disable-2fa-dialog';
+import { EnableTwoFactorDialog } from './enable-2fa-dialog';
 import { Spinner } from './spinner';
 import {
   Form,
@@ -56,10 +58,12 @@ export function SecuritySettings({
   passkeys,
   sessions,
   currentSession,
+  twoFactorEnabled,
 }: {
   passkeys: Passkey[];
   sessions: Session[];
   currentSession: Session;
+  twoFactorEnabled: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -245,67 +249,7 @@ export function SecuritySettings({
           </Card>
         </TabsContent>
 
-        <TabsContent value="two-factor" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Two-Factor Authentication</CardTitle>
-              <CardDescription>
-                Add an extra layer of security to your account.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Two-factor authentication is enabled</AlertTitle>
-                <AlertDescription>
-                  Your account is protected with an authenticator app.
-                </AlertDescription>
-              </Alert>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 rounded-full p-2">
-                      <Smartphone className="text-primary h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Authenticator App</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Google Authenticator
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 hover:bg-green-50 hover:text-green-700">
-                    Active
-                  </Badge>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 rounded-full p-2">
-                      <Smartphone className="text-primary h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">SMS Authentication</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Not configured
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Setup
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline">Disable 2FA</Button>
-              <Button>Reconfigure</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
+        <TwoFactor twoFactorEnabled={twoFactorEnabled} />
 
         {/* TODO: Add name to passkey */}
         <TabsContent value="passkeys" className="space-y-4">
@@ -419,5 +363,62 @@ export function SecuritySettings({
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function TwoFactor({ twoFactorEnabled }: { twoFactorEnabled: boolean }) {
+  return (
+    <TabsContent value="two-factor" className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Two-Factor Authentication</CardTitle>
+          <CardDescription>
+            Add an extra layer of security to your account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {twoFactorEnabled ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Two-factor authentication is enabled</AlertTitle>
+              <AlertDescription>
+                Your account is protected with an authenticator app.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center gap-4">
+                <div className="bg-primary/10 rounded-full p-2">
+                  <Smartphone className="text-primary h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Authenticator App</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Use an authentication app or browser extension to get
+                    two-factor authentication codes when prompted.
+                  </p>
+                </div>
+              </div>
+              {twoFactorEnabled ? (
+                <Badge
+                  variant="outline"
+                  className="bg-green-50 text-green-700 hover:bg-green-50 hover:text-green-700">
+                  Configured
+                </Badge>
+              ) : null}
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          {twoFactorEnabled ? (
+            <DisableTwoFactorDialog />
+          ) : (
+            <EnableTwoFactorDialog />
+          )}
+        </CardFooter>
+      </Card>
+    </TabsContent>
   );
 }
