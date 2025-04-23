@@ -5,7 +5,13 @@
 - 2fa:
   - backup codes
   - otp
-- admin panel
+- admin
+  - impersonating works?
+  - user table pagination, filter, etc
+  - create, ban, unban user
+  - set user role
+  - revoke sessions
+  - delete user
 - organization
 - captcha
 - stripe/polar?

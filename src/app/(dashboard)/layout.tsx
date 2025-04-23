@@ -18,6 +18,7 @@ export default async function Layout({
   if (!session) {
     redirect('/sign-in');
   }
+
   return (
     <SidebarProvider
       style={
@@ -28,7 +29,10 @@ export default async function Layout({
       }>
       <AppSidebar variant="sidebar" user={session.user} />
       <SidebarInset>
-        <SiteHeader />
+        <SiteHeader
+          role={session.user.role ?? undefined}
+          isImpersonating={!!session.session.impersonatedBy}
+        />
         {children}
       </SidebarInset>
     </SidebarProvider>

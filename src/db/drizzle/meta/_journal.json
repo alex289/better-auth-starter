@@ -43,6 +43,13 @@
       "when": 1745351590070,
       "tag": "0005_sticky_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745428768265,
+      "tag": "0006_dapper_mongu",
+      "breakpoints": true
     }
   ]
 }

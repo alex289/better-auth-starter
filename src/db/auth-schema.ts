@@ -18,6 +18,10 @@ export const user = pgTable(
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
     twoFactorEnabled: boolean('two_factor_enabled'),
+    role: text('role'),
+    banned: boolean('banned'),
+    banReason: text('ban_reason'),
+    banExpires: timestamp('ban_expires'),
   },
   (table) => [index('user_email_idx').on(table.email)],
 );

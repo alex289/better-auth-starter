@@ -1,3 +1,4 @@
+import { QueryClientWrapper } from '@/components/query-client-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata, Viewport } from 'next';
@@ -45,8 +46,10 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange>
-            {children}
-            <Toaster />
+            <QueryClientWrapper>
+              {children}
+              <Toaster />
+            </QueryClientWrapper>
           </ThemeProvider>
         </NuqsAdapter>
       </body>
