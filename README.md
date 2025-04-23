@@ -3,9 +3,10 @@
 ## TODO
 
 - 2fa:
-  - sign in with 2fa
   - backup codes
+  - otp
 - admin panel
 - organization
 - captcha
 - stripe/polar?
+- social provider?

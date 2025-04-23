@@ -12,7 +12,7 @@ export const authClient = createAuthClient({
     apiKeyClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
-        window.location.href = '/sign-in?2fa=true';
+        window.location.href = '/two-factor';
       },
     }),
   ],
