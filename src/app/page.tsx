@@ -30,11 +30,6 @@ export default async function Home() {
                   Login
                 </Button>
               </Link>
-              <Link href="/sign-up">
-                <Button size="sm" className="cursor-pointer">
-                  Sign up
-                </Button>
-              </Link>
             </nav>
           </div>
         </div>

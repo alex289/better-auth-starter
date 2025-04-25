@@ -30,6 +30,3 @@
     - update role
     - leave
 - stripe/polar
-- social provider
-  - github
-  - google
