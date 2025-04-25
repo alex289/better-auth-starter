@@ -21,6 +21,7 @@ import {
 } from '../ui/select';
 
 export default function CreateUserDialog() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState<string | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
