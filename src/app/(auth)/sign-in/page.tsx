@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import Captcha from '@/components/captcha';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,7 +50,7 @@ const resetPasswordSchema = z.object({
   email: z.string().email(),
 });
 
-function ForgotPasswordDialog() {
+function ForgotPasswordDialog({ captchaToken }: { captchaToken: string }) {
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
@@ -63,6 +64,11 @@ function ForgotPasswordDialog() {
     const { error } = await authClient.forgetPassword({
       email: values.email,
       redirectTo: '/reset-password',
+      fetchOptions: {
+        headers: {
+          'x-captcha-response': captchaToken,
+        },
+      },
     });
 
     setLoading(false);
@@ -132,6 +138,7 @@ function ForgotPasswordDialog() {
 export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<'passkey' | 'password' | null>(null);
+  const [captchaToken, setCaptchaToken] = useState('');
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -163,6 +170,11 @@ export default function SignInPage() {
       email: values.email,
       password: values.password,
       rememberMe: values.rememberMe,
+      fetchOptions: {
+        headers: {
+          'x-captcha-response': captchaToken,
+        },
+      },
     });
     setLoading(null);
 
@@ -210,7 +222,8 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem className="grid gap-1">
                   <FormLabel className="flex justify-between">
-                    Password <ForgotPasswordDialog />
+                    Password{' '}
+                    <ForgotPasswordDialog captchaToken={captchaToken} />
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="..." type="password" {...field} />
@@ -272,6 +285,7 @@ export default function SignInPage() {
           </Link>
         </div>
       </CardContent>
+      <Captcha handleVerify={setCaptchaToken} />
     </Card>
   );
 }

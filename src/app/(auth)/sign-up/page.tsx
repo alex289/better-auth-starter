@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import Captcha from '@/components/captcha';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import {
@@ -46,6 +47,7 @@ const signUpSchema = z
 export default function SignUpPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -69,6 +71,11 @@ export default function SignUpPage() {
       password: values.password,
       name: values.name,
       image: values.image.length > 0 ? values.image : undefined,
+      fetchOptions: {
+        headers: {
+          'x-captcha-response': captchaToken,
+        },
+      },
     });
 
     setLoading(false);
@@ -218,6 +225,7 @@ export default function SignUpPage() {
           </Link>
         </div>
       </CardContent>
+      <Captcha handleVerify={setCaptchaToken} />
     </Card>
   );
 }

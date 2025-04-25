@@ -1,7 +1,13 @@
 import { db } from '@/db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { admin, apiKey, haveIBeenPwned, twoFactor } from 'better-auth/plugins';
+import {
+  admin,
+  apiKey,
+  captcha,
+  haveIBeenPwned,
+  twoFactor,
+} from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
 import { createClient } from 'redis';
 import {
@@ -49,10 +55,10 @@ export const auth = betterAuth({
     apiKey(),
     twoFactor(),
     admin(),
-    // captcha({
-    //   provider: 'google-recaptcha',
-    //   secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,
-    // }),
+    captcha({
+      provider: 'google-recaptcha',
+      secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,
+    }),
   ],
   user: {
     deleteUser: {

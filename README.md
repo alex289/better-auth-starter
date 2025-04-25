@@ -29,9 +29,6 @@
     - remove
     - update role
     - leave
-- captcha
-  - which provider?
-  - required endpoints: ["/sign-up/email", "/sign-in/email", "/forget-password",]
 - stripe/polar
 - social provider
   - github
