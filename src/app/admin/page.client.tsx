@@ -13,7 +13,7 @@ import { columns } from './columns';
 import { DataTable } from './data-table';
 
 export default function AdminPageClient() {
-  const [limit] = useQueryState('limit', parseAsInteger.withDefault(10));
+  const [pageSize] = useQueryState('limit', parseAsInteger.withDefault(1000));
   const [sortBy] = useQueryState(
     'sortBy',
     parseAsString.withDefault('createdAt'),
@@ -22,25 +22,20 @@ export default function AdminPageClient() {
     'sortDirection',
     parseAsStringLiteral(['asc', 'desc']).withDefault('desc'),
   );
+  const [search] = useQueryState('search', parseAsString.withDefault(''));
+  const [currentPage] = useQueryState('page', parseAsInteger.withDefault(1));
+
   const { data: users, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const data = await authClient.admin.listUsers(
         {
           query: {
-            limit,
+            limit: pageSize,
             sortBy,
             sortDirection,
-            // searchField: "email",
-            // searchOperator: "contains",
-            // searchValue: "@example.com",
-            // limit: 10,
-            // offset: 0,
-            // sortBy: "createdAt",
-            // sortDirection: "desc"
-            // filterField: "role",
-            // filterOperator: "eq",
-            // filterValue: "admin"
+            searchValue: search,
+            offset: (currentPage - 1) * pageSize,
           },
         },
         {

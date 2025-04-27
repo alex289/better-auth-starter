@@ -1,7 +1,12 @@
 import { SecuritySettings } from '@/components/security-settings';
 import { auth } from '@/lib/auth';
+import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Security',
+};
 
 export default async function Page() {
   const currentSession = await auth.api.getSession({

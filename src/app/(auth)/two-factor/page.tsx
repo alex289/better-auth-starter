@@ -104,10 +104,7 @@ export default function Page() {
             />
 
             <div className="flex flex-col gap-4">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="cursor-pointer">
+              <Button type="submit" disabled={loading}>
                 {loading ? (
                   <Spinner className="text-white dark:text-black" />
                 ) : null}
@@ -117,7 +114,7 @@ export default function Page() {
           </form>
         </Form>
         <div className="mt-4 text-center text-sm">
-          <Link href="/sign-up" className="underline">
+          <Link href="/two-factor/otp" className="underline">
             Switch to Email Verification
           </Link>
         </div>

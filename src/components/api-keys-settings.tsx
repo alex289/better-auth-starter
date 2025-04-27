@@ -141,7 +141,7 @@ export function ApiKeysSettings({
         </div>
         <Dialog open={showNewKeyDialog} onOpenChange={setShowNewKeyDialog}>
           <DialogTrigger asChild>
-            <Button className="cursor-pointer">
+            <Button>
               <Plus className="mr-2 h-4 w-4" />
               Create API Key
             </Button>
@@ -247,14 +247,10 @@ export function ApiKeysSettings({
                         disabled={loading}
                         type="button"
                         variant="outline"
-                        className="cursor-pointer"
                         onClick={() => setShowNewKeyDialog(false)}>
                         Cancel
                       </Button>
-                      <Button
-                        disabled={loading}
-                        type="submit"
-                        className="cursor-pointer">
+                      <Button disabled={loading} type="submit">
                         {loading ? (
                           <Spinner className="text-white dark:text-black" />
                         ) : null}
@@ -361,7 +357,7 @@ export function ApiKeysSettings({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-destructive cursor-pointer"
+                  className="text-destructive"
                   onClick={async () => await deleteKey(apiKey.id)}>
                   <Trash className="mr-1 h-3.5 w-3.5" />
                   Delete

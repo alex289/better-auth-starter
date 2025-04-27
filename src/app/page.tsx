@@ -26,7 +26,7 @@ export default async function Home() {
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-2">
               <Link href="/sign-in">
-                <Button variant="ghost" size="sm" className="cursor-pointer">
+                <Button variant="ghost" size="sm">
                   Login
                 </Button>
               </Link>
@@ -49,15 +49,13 @@ export default async function Home() {
               </div>
               <div className="space-x-4">
                 <Link href="/sign-up">
-                  <Button className="cursor-pointer">
+                  <Button>
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/docs">
-                  <Button variant="outline" className="cursor-pointer">
-                    Documentation
-                  </Button>
+                  <Button variant="outline">Documentation</Button>
                 </Link>
               </div>
             </div>

@@ -1,6 +1,11 @@
 import { auth } from '@/lib/auth';
+import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Two-Factor',
+};
 
 export default async function AuthLayout({
   children,

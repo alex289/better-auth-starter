@@ -2,9 +2,14 @@ import AdminNavbar from '@/components/admin-navbar';
 import CreateUserDialog from '@/components/dialogs/create-user-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
+import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import AdminPageClient from './page.client';
+
+export const metadata: Metadata = {
+  title: 'Admin',
+};
 
 export default async function AdminPage() {
   const session = await auth.api.getSession({

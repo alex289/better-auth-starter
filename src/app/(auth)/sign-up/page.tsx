@@ -207,10 +207,7 @@ export default function SignUpPage() {
               )}
             />
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full cursor-pointer">
+            <Button type="submit" disabled={loading}>
               {loading ? (
                 <Spinner className="text-white dark:text-black" />
               ) : null}

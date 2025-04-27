@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Better Auth Starter',
+  title: {
+    default: 'Better Auth Starter',
+    template: '%s | Better Auth Starter',
+  },
   description: 'A starter kit for better-auth with Next.js',
 };
 

@@ -14,6 +14,7 @@ import {
   changeEmail,
   deleteAccountEmail,
   sendForgotPasswordEmail,
+  sendOtpVerificationEmail,
   verifyEmail,
 } from './email';
 
@@ -53,7 +54,13 @@ export const auth = betterAuth({
     passkey(),
     haveIBeenPwned(),
     apiKey(),
-    twoFactor(),
+    twoFactor({
+      otpOptions: {
+        async sendOTP({ user, otp }) {
+          await sendOtpVerificationEmail(user.email, user.name, otp);
+        },
+      },
+    }),
     admin(),
     captcha({
       provider: 'google-recaptcha',
@@ -68,6 +75,11 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
+  account: {
+    accountLinking: {
+      trustedProviders: ['google', 'github', 'demo-app'],
     },
   },
   user: {

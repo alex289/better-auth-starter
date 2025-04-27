@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client';
 
 import BanUserDialog from '@/components/dialogs/ban-user-dialog';
+import DeleteUserDialog from '@/components/dialogs/delete-user-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,13 +16,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { authClient } from '@/lib/auth-client';
+import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { UserWithRole } from 'better-auth/plugins';
 import {
   ClipboardCopy,
+  DiamondMinus,
+  DiamondPlus,
+  LogOut,
   MoreHorizontal,
   RefreshCw,
-  Trash,
   UserCircle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -113,15 +118,15 @@ export const columns: ColumnDef<UserWithRole>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       const router = useRouter();
+      const queryClient = useQueryClient();
       const user = row.original;
 
-      async function impersonateUser(id: string) {
-        const res = await authClient.admin.impersonateUser({ userId: id });
+      async function impersonateUser() {
+        const res = await authClient.admin.impersonateUser({ userId: user.id });
 
         if (res.error) {
-          toast.error('Failed to send reset password email', {
+          toast.error('Failed to impersonate user', {
             description: res.error.message,
           });
           return;
@@ -129,6 +134,58 @@ export const columns: ColumnDef<UserWithRole>[] = [
 
         toast.success('Impersonated user');
         router.push('/dashboard');
+      }
+
+      async function setUserRole() {
+        const res = await authClient.admin.setRole({
+          userId: user.id,
+          role: user.role === 'user' ? 'admin' : 'user',
+        });
+
+        if (res.error) {
+          toast.error('Failed to set user role', {
+            description: res.error.message,
+          });
+          return;
+        }
+
+        toast.success('User role updated');
+        queryClient.invalidateQueries({
+          queryKey: ['users'],
+        });
+      }
+
+      async function revokeUserSessions() {
+        const res = await authClient.admin.revokeUserSessions({
+          userId: user.id,
+        });
+
+        if (res.error) {
+          toast.error('Failed to revoke user sessions', {
+            description: res.error.message,
+          });
+          return;
+        }
+
+        toast.success('User sessions revoked');
+      }
+
+      async function unbanUser() {
+        const res = await authClient.admin.unbanUser({
+          userId: user.id,
+        });
+
+        if (res.error) {
+          toast.error('Failed to unban user', {
+            description: res.error.message,
+          });
+          return;
+        }
+
+        toast.success('User unbanned');
+        queryClient.invalidateQueries({
+          queryKey: ['users'],
+        });
       }
 
       return (
@@ -151,29 +208,34 @@ export const columns: ColumnDef<UserWithRole>[] = [
                 Copy user ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Trash className="mr-2 h-4 w-4" /> Delete user
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <RefreshCw className="mr-2 h-4 w-4" /> Revoke sessions
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={async () => await impersonateUser(user.id)}>
+              <DropdownMenuItem onClick={async () => await impersonateUser()}>
                 <UserCircle className="mr-2 h-4 w-4" />
                 Impersonate
               </DropdownMenuItem>
-              {/* <DropdownMenuItem> */}
-              {/* {user.banned ? (
+              <DropdownMenuItem onClick={async () => await setUserRole()}>
+                {user.role === 'user' ? (
                   <>
-                    <CircleOff className="mr-2 h-4 w-4" /> Unban user
+                    <DiamondPlus className="mr-2 h-4 w-4" /> Upgrade to admin
                   </>
                 ) : (
                   <>
-                    <Ban className="mr-2 h-4 w-4" /> Ban user
+                    <DiamondMinus className="mr-2 h-4 w-4" />
+                    Downgrade to user
                   </>
-                )} */}
-              <BanUserDialog banned={user.banned ?? false} />
-              {/* </DropdownMenuItem> */}
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => await revokeUserSessions()}>
+                <LogOut className="mr-2 h-4 w-4" /> Revoke sessions
+              </DropdownMenuItem>
+              {user.banned ? (
+                <DropdownMenuItem onClick={async () => await unbanUser()}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Unban user
+                </DropdownMenuItem>
+              ) : (
+                <BanUserDialog userId={user.id} />
+              )}
+              <DeleteUserDialog userId={user.id} />
             </DropdownMenuContent>
           </DropdownMenu>
         </>

@@ -1,7 +1,12 @@
 import { SettingsContent } from '@/components/settings-content';
 import { auth } from '@/lib/auth';
+import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Account',
+};
 
 export default async function Page() {
   const session = await auth.api.getSession({

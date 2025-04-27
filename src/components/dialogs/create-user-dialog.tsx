@@ -1,7 +1,14 @@
 'use client';
 
-import { Loader2, Plus } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { Spinner } from '../spinner';
 import { Button } from '../ui/button';
 import {
   Dialog,
@@ -10,8 +17,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import {
   Select,
   SelectContent,
@@ -20,39 +34,53 @@ import {
   SelectValue,
 } from '../ui/select';
 
+const createUserSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(8),
+  role: z.enum(['user', 'admin']),
+});
+
 export default function CreateUserDialog() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoading, setIsLoading] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: '',
-    password: '',
-    name: '',
-    role: 'user' as const,
+  const queryClient = useQueryClient();
+
+  const form = useForm<z.infer<typeof createUserSchema>>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      name: '',
+      role: 'user' as const,
+    },
   });
 
-  // const handleCreateUser = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setIsLoading("create");
-  //   try {
-  //     await client.admin.createUser({
-  //       email: newUser.email,
-  //       password: newUser.password,
-  //       name: newUser.name,
-  //       role: newUser.role,
-  //     });
-  //     toast.success("User created successfully");
-  //     setNewUser({ email: "", password: "", name: "", role: "user" });
-  //     setIsDialogOpen(false);
-  //     queryClient.invalidateQueries({
-  //       queryKey: ["users"],
-  //     });
-  //   } catch (error: any) {
-  //     toast.error(error.message || "Failed to create user");
-  //   } finally {
-  //     setIsLoading(undefined);
-  //   }
-  // };
+  async function onSubmit(values: z.infer<typeof createUserSchema>) {
+    setIsLoading(true);
+
+    const { error } = await authClient.admin.createUser({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: values.role,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast.error('Failed to create user', {
+        description: error.message,
+      });
+      return;
+    }
+
+    queryClient.invalidateQueries({
+      queryKey: ['users'],
+    });
+    setIsDialogOpen(false);
+    toast.success('User created');
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -65,70 +93,83 @@ export default function CreateUserDialog() {
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
         </DialogHeader>
-        <form className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={newUser.email}
-              onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
-              }
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Max Mustermann" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={newUser.password}
-              onChange={(e) =>
-                setNewUser({ ...newUser, password: e.target.value })
-              }
-              required
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="max@mustermann.com"
+                      type="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={newUser.name}
-              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-              required
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Password" type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="role">Role</Label>
-            <Select
-              value={newUser.role}
-              onValueChange={(value: 'admin' | 'user') =>
-                setNewUser({ ...newUser, role: value as 'user' })
-              }>
-              <SelectTrigger>
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="user">User</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading === 'create'}>
-            {isLoading === 'create' ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create User'
-            )}
-          </Button>
-        </form>
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel>Role</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <Spinner className="text-white dark:text-black" />
+              ) : null}
+              Create User
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

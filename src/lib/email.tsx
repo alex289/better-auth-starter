@@ -1,5 +1,6 @@
 import ChangeEmail from '@/email/change-email';
 import DeleteAccount from '@/email/delete-account';
+import OtpVerification from '@/email/otp-verification';
 import ResetPassword from '@/email/reset-password';
 import VerifyEmail from '@/email/verify-email';
 import { render } from '@react-email/components';
@@ -100,6 +101,29 @@ export async function deleteAccountEmail(
     from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Better-Auth-Starter - Delete your account',
+    html: emailHtml,
+  };
+
+  await transporter.sendMail(options);
+}
+
+export async function sendOtpVerificationEmail(
+  email: string,
+  username: string,
+  otp: string,
+) {
+  const emailHtml = await render(
+    <OtpVerification
+      username={username}
+      baseUrl={process.env.BETTER_AUTH_URL as string}
+      otp={otp}
+    />,
+  );
+
+  const options = {
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: 'Better-Auth-Starter - One-time password verification',
     html: emailHtml,
   };
 

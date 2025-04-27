@@ -174,10 +174,7 @@ export function SettingsContent({ user }: { user: User }) {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="mt-4 cursor-pointer">
+              <Button type="submit" disabled={loading} className="mt-4">
                 {loading ? (
                   <Spinner className="text-white dark:text-black" />
                 ) : null}

@@ -120,7 +120,6 @@ function ForgotPasswordDialog({ captchaToken }: { captchaToken: string }) {
             <DialogFooter>
               <Button
                 disabled={loading}
-                className="cursor-pointer"
                 type="button"
                 onClick={form.handleSubmit(onSubmit)}>
                 {loading ? (
@@ -253,10 +252,7 @@ export default function SignInPage() {
             />
 
             <div className="flex flex-col gap-4">
-              <Button
-                type="submit"
-                disabled={loading === 'password'}
-                className="cursor-pointer">
+              <Button type="submit" disabled={loading === 'password'}>
                 {loading === 'password' ? (
                   <Spinner className="text-white dark:text-black" />
                 ) : null}
@@ -268,7 +264,7 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 type="button"
-                className="cursor-pointer gap-2"
+                className="gap-2"
                 disabled={loading === 'passkey'}
                 onClick={async () => await passkeySignIn()}>
                 {loading === 'passkey' ? (
@@ -282,7 +278,7 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 type="button"
-                className="cursor-pointer gap-2"
+                className="gap-2"
                 onClick={async () =>
                   await authClient.signIn.social({
                     provider: 'github',
@@ -294,10 +290,10 @@ export default function SignInPage() {
                   viewBox="0 0 17 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_3378_20115)">
+                  <g clipPath="url(#clip0_3378_20115)">
                     <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
+                      fillRule="evenodd"
+                      clipRule="evenodd"
                       d="M8.50662 0C4.07917 0 0.5 3.60555 0.5 8.06611C0.5 11.6317 2.79329 14.6498 5.9747 15.7181C6.37246 15.7984 6.51816 15.5445 6.51816 15.331C6.51816 15.144 6.50505 14.503 6.50505 13.8352C4.2778 14.316 3.81399 12.8736 3.81399 12.8736C3.45606 11.9388 2.92572 11.6985 2.92572 11.6985C2.19674 11.2044 2.97882 11.2044 2.97882 11.2044C3.78744 11.2578 4.21175 12.0324 4.21175 12.0324C4.92745 13.2609 6.08074 12.9138 6.54471 12.7001C6.61092 12.1792 6.82315 11.8187 7.0485 11.6184C5.27211 11.4314 3.40312 10.737 3.40312 7.63869C3.40312 6.7573 3.72107 6.03619 4.22486 5.47536C4.14538 5.27509 3.86693 4.44696 4.30451 3.33858C4.30451 3.33858 4.98055 3.12487 6.50488 4.16654C7.1575 3.98998 7.83054 3.90016 8.50662 3.8994C9.18266 3.8994 9.87181 3.99298 10.5082 4.16654C12.0327 3.12487 12.7087 3.33858 12.7087 3.33858C13.1463 4.44696 12.8677 5.27509 12.7882 5.47536C13.3053 6.03619 13.6101 6.7573 13.6101 7.63869C13.6101 10.737 11.7411 11.418 9.95146 11.6184C10.2432 11.8721 10.4949 12.3528 10.4949 13.114C10.4949 14.1957 10.4818 15.0638 10.4818 15.3308C10.4818 15.5445 10.6277 15.7984 11.0253 15.7182C14.2067 14.6497 16.5 11.6317 16.5 8.06611C16.5131 3.60555 12.9208 0 8.50662 0Z"
                       fill="currentColor"></path>
                   </g>
@@ -316,7 +312,7 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 type="button"
-                className="cursor-pointer gap-2"
+                className="gap-2"
                 onClick={async () =>
                   await authClient.signIn.social({
                     provider: 'google',
@@ -328,7 +324,7 @@ export default function SignInPage() {
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_3378_20108)">
+                  <g clipPath="url(#clip0_3378_20108)">
                     <path
                       d="M8 6.54541V9.6436H12.3054C12.1164 10.64 11.549 11.4836 10.6981 12.0509L13.2945 14.0655C14.8072 12.6691 15.68 10.6182 15.68 8.18185C15.68 7.61459 15.6291 7.06908 15.5345 6.5455L8 6.54541Z"
                       fill="#4285F4"></path>

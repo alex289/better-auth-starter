@@ -22,6 +22,7 @@ import {
   AlertCircle,
   Check,
   KeyRound,
+  Laptop,
   LogOut,
   Shield,
   Smartphone,
@@ -30,6 +31,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { UAParser } from 'ua-parser-js';
 import { z } from 'zod';
 import { DisableTwoFactorDialog } from './disable-2fa-dialog';
 import { EnableTwoFactorDialog } from './enable-2fa-dialog';
@@ -187,10 +189,7 @@ function PasswordTab() {
               />
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="mt-4 cursor-pointer">
+              <Button type="submit" disabled={loading} className="mt-4">
                 {loading ? (
                   <Spinner className="text-white dark:text-black" />
                 ) : null}
@@ -250,7 +249,7 @@ function SessionTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {sessions.map((session, index) => (
+          {sessions.map((session) => (
             <div
               key={session.token}
               className="flex items-center justify-between">
@@ -265,15 +264,16 @@ function SessionTab({
                   </div>
                 )}
                 <div>
-                  <h3 className="font-medium">
-                    {/* TODO: Improve session name */}
-                    {session.token === currentSession.token
-                      ? 'Current Session'
-                      : (session.ipAddress ?? 'Session ' + (index + 1))}
+                  <h3 className="flex items-center gap-2 font-medium">
+                    {new UAParser(session.userAgent || '').getDevice().type ===
+                    'mobile' ? (
+                      <Smartphone />
+                    ) : (
+                      <Laptop />
+                    )}
+                    {new UAParser(session.userAgent || '').getOS().name},{' '}
+                    {new UAParser(session.userAgent || '').getBrowser().name}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {session.userAgent}
-                  </p>
                   <p className="text-muted-foreground text-xs">
                     Last active: {formatDistanceToNow(session.updatedAt)}
                   </p>
@@ -294,7 +294,6 @@ function SessionTab({
         <CardFooter>
           <Button
             variant="destructive"
-            className="cursor-pointer"
             onClick={async () => await revokeAllOtherSessions()}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout of All Other Sessions
@@ -380,7 +379,7 @@ function PasskeyTab({ passkeys }: { passkeys: Passkey[] }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-destructive cursor-pointer"
+                className="text-destructive"
                 onClick={async () => await removePasskey(passkey)}>
                 Remove
               </Button>
@@ -403,10 +402,7 @@ function PasskeyTab({ passkeys }: { passkeys: Passkey[] }) {
                   </FormItem>
                 )}
               />
-              <Button
-                disabled={loading}
-                className="cursor-pointer"
-                type="submit">
+              <Button disabled={loading} type="submit">
                 {loading ? (
                   <Spinner className="mr-2 h-4 w-4 text-white dark:text-black" />
                 ) : (

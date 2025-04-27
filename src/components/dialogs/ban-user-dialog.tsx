@@ -1,9 +1,16 @@
 'use client';
 
+import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { Ban, CalendarIcon, CircleOff, Loader2 } from 'lucide-react';
+import { Ban, CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { Spinner } from '../spinner';
 import { Button } from '../ui/button';
 import { Calendar } from '../ui/calendar';
 import {
@@ -14,132 +21,134 @@ import {
   DialogTrigger,
 } from '../ui/dialog';
 import { DropdownMenuItem } from '../ui/dropdown-menu';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
-export default function BanUserDialog({ banned }: { banned: boolean }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoading, setIsLoading] = useState<string | undefined>();
+const banSchema = z.object({
+  reason: z.string(),
+  expirationDate: z.date().optional(),
+});
+
+export default function BanUserDialog({ userId }: { userId: string }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
-  const [banForm, setBanForm] = useState({
-    userId: '',
-    reason: '',
-    expirationDate: undefined as Date | undefined,
+  const queryClient = useQueryClient();
+
+  const form = useForm<z.infer<typeof banSchema>>({
+    resolver: zodResolver(banSchema),
+    defaultValues: {
+      reason: '',
+      expirationDate: undefined,
+    },
   });
 
-  //   onClick={async () => {
-  //     setBanForm({
-  //         userId: user.id,
-  //         reason: "",
-  //         expirationDate: undefined,
-  //     });
-  //     if (user.banned) {
-  //         setIsLoading(`ban-${user.id}`);
-  //         await client.admin.unbanUser(
-  //             {
-  //                 userId: user.id,
-  //             },
-  //             {
-  //                 onError(context) {
-  //                     toast.error(
-  //                         context.error.message ||
-  //                             "Failed to unban user",
-  //                     );
-  //                     setIsLoading(undefined);
-  //                 },
-  //                 onSuccess() {
-  //                     queryClient.invalidateQueries({
-  //                         queryKey: ["users"],
-  //                     });
-  //                     toast.success("User unbanned successfully");
-  //                 },
-  //             },
-  //         );
-  //         queryClient.invalidateQueries({
-  //             queryKey: ["users"],
-  //         });
-  //     } else {
-  //         setIsBanDialogOpen(true);
-  //     }
-  // }}
+  async function onSubmit(values: z.infer<typeof banSchema>) {
+    setIsLoading(true);
+
+    const { error } = await authClient.admin.banUser({
+      userId,
+      banReason: values.reason.length > 0 ? values.reason : undefined,
+      banExpiresIn: values.expirationDate
+        ? values.expirationDate.getTime() - new Date().getTime()
+        : undefined,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast.error('Failed to ban user', {
+        description: error.message,
+      });
+      return;
+    }
+
+    queryClient.invalidateQueries({
+      queryKey: ['users'],
+    });
+    setIsBanDialogOpen(false);
+    toast.success('User banned');
+  }
 
   return (
     <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
       <DialogTrigger asChild>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          {banned ? (
-            <>
-              <CircleOff className="mr-2 h-4 w-4" /> Unban user
-            </>
-          ) : (
-            <>
-              <Ban className="mr-2 h-4 w-4" /> Ban user
-            </>
-          )}
+          <Ban className="mr-2 h-4 w-4" /> Ban user
         </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ban User</DialogTitle>
         </DialogHeader>
-        <form className="space-y-4">
-          <div>
-            <Label htmlFor="reason">Reason</Label>
-            <Input
-              id="reason"
-              value={banForm.reason}
-              onChange={(e) =>
-                setBanForm({ ...banForm, reason: e.target.value })
-              }
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Reason</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Spamming" type="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="expirationDate">Expiration Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="expirationDate"
-                  variant={'outline'}
-                  className={cn(
-                    'w-full justify-start text-left font-normal',
-                    !banForm.expirationDate && 'text-muted-foreground',
-                  )}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {banForm.expirationDate ? (
-                    format(banForm.expirationDate, 'PPP')
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={banForm.expirationDate}
-                  onSelect={(date) =>
-                    setBanForm({ ...banForm, expirationDate: date })
-                  }
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading === `ban-${banForm.userId}`}>
-            {isLoading === `ban-${banForm.userId}` ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Banning...
-              </>
-            ) : (
-              'Ban User'
-            )}
-          </Button>
-        </form>
+            <FormField
+              control={form.control}
+              name="expirationDate"
+              render={({ field }) => (
+                <FormItem className="grid gap-1">
+                  <FormLabel>Expiration Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}>
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={{ before: new Date() }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <Spinner className="text-white dark:text-black" />
+              ) : null}
+              Ban User
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
