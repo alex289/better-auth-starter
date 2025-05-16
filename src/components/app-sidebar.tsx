@@ -28,10 +28,14 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from '@/components/ui/sidebar';
+import { authClient } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
 import { User } from 'better-auth';
-import { ChevronDown, PlusCircle } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { toast } from 'sonner';
+import CreateOrganizationDialog from './dialogs/create-organization-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import {
@@ -43,15 +47,6 @@ import {
 } from './ui/dropdown-menu';
 
 const data = {
-  organizations: [
-    { slug: '1', name: 'Acme Inc', logo: 'https://example.com/logo.png' },
-    { slug: '2', name: 'Globex Corp', logo: 'https://example.com/logo.png' },
-    {
-      slug: '3',
-      name: 'Stark Industries',
-      logo: 'https://example.com/logo.png',
-    },
-  ],
   navMain: [
     {
       title: 'Dashboard',
@@ -165,10 +160,35 @@ const data = {
 
 export function AppSidebar({
   user,
+  activeOrganizationId,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user: User }) {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [currentOrg, setCurrentOrg] = useState(data.organizations[0]!);
+}: React.ComponentProps<typeof Sidebar> & {
+  user: User;
+  activeOrganizationId: string | null | undefined;
+}) {
+  const router = useRouter();
+
+  const { data: organizations } = authClient.useListOrganizations();
+  const currentOrg = useMemo(() => {
+    if (!activeOrganizationId) return null;
+    return organizations?.find((org) => org.id === activeOrganizationId);
+  }, [activeOrganizationId, organizations]);
+
+  async function setActiveOrganization(organizationId: string) {
+    const { error } = await authClient.organization.setActive({
+      organizationId,
+    });
+
+    if (error) {
+      toast.error('Failed to set active organization', {
+        description: error.message,
+      });
+    }
+
+    toast.success('Active organization set successfully');
+    router.refresh();
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -178,25 +198,36 @@ export function AppSidebar({
               <Button
                 variant="ghost"
                 className="flex w-full items-center justify-start gap-2 px-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={currentOrg.logo ?? undefined}
-                    alt={currentOrg.name}
-                  />
-                  <AvatarFallback>
-                    {getInitials(currentOrg.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="font-medium">{currentOrg.name}</span>
-                <ChevronDown className="ml-auto h-4 w-4" />
+                {currentOrg ? (
+                  <>
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage
+                        src={currentOrg.logo ?? undefined}
+                        alt={currentOrg.name}
+                      />
+                      <AvatarFallback>
+                        {getInitials(currentOrg.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{currentOrg.name}</span>
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                  </>
+                ) : (
+                  <span className="font-medium">Select Organization</span>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[200px]">
-              {data.organizations.map((org) => (
+              {!organizations || organizations.length === 0 ? (
+                <DropdownMenuItem disabled>
+                  No organizations yet
+                </DropdownMenuItem>
+              ) : null}
+              {organizations?.map((org) => (
                 <DropdownMenuItem
                   key={org.slug}
                   className="cursor-pointer"
-                  onClick={() => setCurrentOrg(org)}>
+                  onClick={() => setActiveOrganization(org.id)}>
                   <Avatar className="mr-2 h-5 w-5">
                     <AvatarImage src={org.logo ?? undefined} alt={org.name} />
                     <AvatarFallback>{getInitials(org.name)}</AvatarFallback>
@@ -205,10 +236,7 @@ export function AppSidebar({
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Create Organization</span>
-              </DropdownMenuItem>
+              <CreateOrganizationDialog />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

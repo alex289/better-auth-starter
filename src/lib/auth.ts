@@ -6,6 +6,7 @@ import {
   apiKey,
   captcha,
   haveIBeenPwned,
+  organization,
   twoFactor,
 } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
@@ -66,6 +67,17 @@ export const auth = betterAuth({
       provider: 'google-recaptcha',
       secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,
     }),
+    organization({
+      // sendInvitationEmail: async (data) => {
+      //    await sendInvitationEmail(user.email, user.name, url);
+      // },
+      // allowUserToCreateOrganization: async (user) => {
+      //     const subscription = await getSubscription(user.id)
+      //     return subscription.plan === "pro"
+      // }
+    }),
+    // If using preview deployments
+    // oAuthProxy(),
   ],
   socialProviders: {
     github: {

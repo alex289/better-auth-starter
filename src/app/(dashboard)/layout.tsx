@@ -27,7 +27,11 @@ export default async function Layout({
           '--header-height': 'calc(var(--spacing) * 12)',
         } as React.CSSProperties
       }>
-      <AppSidebar variant="sidebar" user={session.user} />
+      <AppSidebar
+        variant="sidebar"
+        user={session.user}
+        activeOrganizationId={session.session.activeOrganizationId}
+      />
       <SidebarInset>
         <SiteHeader
           role={session.user.role ?? undefined}

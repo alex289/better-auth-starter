@@ -50,6 +50,13 @@
       "when": 1745428768265,
       "tag": "0006_dapper_mongu",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1745863870880,
+      "tag": "0007_rich_drax",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import {
   adminClient,
   apiKeyClient,
+  organizationClient,
   passkeyClient,
   twoFactorClient,
 } from 'better-auth/client/plugins';
@@ -12,6 +13,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     apiKeyClient(),
     adminClient(),
+    organizationClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
         window.location.href = '/two-factor';

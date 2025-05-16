@@ -2,13 +2,9 @@
 
 ## TODO
 
-- backup codes
 - organization
-  - create
   - update
   - delete
-  - list user orgs
-  - set active org
   - admin org settings
   - invitations
     - send
