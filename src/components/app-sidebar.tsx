@@ -124,8 +124,8 @@ const data = {
   ],
   navSecondary: [
     {
-      title: 'Settings',
-      url: '#',
+      title: 'Organization Settings',
+      url: '/organization/settings',
       icon: IconSettings,
     },
     {

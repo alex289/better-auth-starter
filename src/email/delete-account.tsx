@@ -23,7 +23,7 @@ function DeleteAccount({ url, username, baseUrl }: DeleteAccountProps) {
   return (
     <Html>
       <Head />
-      <Preview>Click on the button to delete your account</Preview>
+      <Preview>Delete your account</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white px-2 font-sans">
           <Container className="mx-auto my-[40px] max-w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">

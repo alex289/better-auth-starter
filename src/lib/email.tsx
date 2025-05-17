@@ -1,5 +1,6 @@
 import ChangeEmail from '@/email/change-email';
 import DeleteAccount from '@/email/delete-account';
+import InviteUserEmail from '@/email/invite-member';
 import OtpVerification from '@/email/otp-verification';
 import ResetPassword from '@/email/reset-password';
 import VerifyEmail from '@/email/verify-email';
@@ -124,6 +125,39 @@ export async function sendOtpVerificationEmail(
     from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Better-Auth-Starter - One-time password verification',
+    html: emailHtml,
+  };
+
+  await transporter.sendMail(options);
+}
+
+export async function inviteOrganisationMember(
+  email: string,
+  username: string,
+  invitedByUsername: string,
+  invitedByEmail: string,
+  organizationName: string,
+  inviteLink: string,
+  userImage?: string | null | undefined,
+  organizationLogo?: string | null | undefined,
+) {
+  const emailHtml = await render(
+    <InviteUserEmail
+      username={username}
+      baseUrl={process.env.BETTER_AUTH_URL as string}
+      userImage={userImage}
+      invitedByUsername={invitedByUsername}
+      invitedByEmail={invitedByEmail}
+      organizationName={organizationName}
+      organizationLogo={organizationLogo}
+      inviteLink={inviteLink}
+    />,
+  );
+
+  const options = {
+    from: `"Better-Auth-Starter" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: 'Better-Auth-Starter - Invitation to join organization',
     html: emailHtml,
   };
 

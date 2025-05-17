@@ -1,4 +1,5 @@
 import { db } from '@/db';
+import { user } from '@/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import {
@@ -10,10 +11,12 @@ import {
   twoFactor,
 } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
+import { eq } from 'drizzle-orm';
 import { createClient } from 'redis';
 import {
   changeEmail,
   deleteAccountEmail,
+  inviteOrganisationMember,
   sendForgotPasswordEmail,
   sendOtpVerificationEmail,
   verifyEmail,
@@ -68,9 +71,23 @@ export const auth = betterAuth({
       secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,
     }),
     organization({
-      // sendInvitationEmail: async (data) => {
-      //    await sendInvitationEmail(user.email, user.name, url);
-      // },
+      sendInvitationEmail: async (data) => {
+        const invitedUser = await db.query.user.findFirst({
+          where: eq(user.email, data.email),
+        });
+
+        const inviteLink = `${process.env.BETTER_AUTH_URL}/accept-invitation/${data.id}`;
+        await inviteOrganisationMember(
+          data.email,
+          invitedUser?.name ?? '',
+          data.inviter.user.name,
+          data.inviter.user.email,
+          data.organization.name,
+          inviteLink,
+          invitedUser?.image,
+          data.organization.logo,
+        );
+      },
       // allowUserToCreateOrganization: async (user) => {
       //     const subscription = await getSubscription(user.id)
       //     return subscription.plan === "pro"

@@ -23,7 +23,7 @@ function ResetPassword({ url, username, baseUrl }: ResetPasswordProps) {
   return (
     <Html>
       <Head />
-      <Preview>Click on the button to reset your password</Preview>
+      <Preview>Reset your password</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white px-2 font-sans">
           <Container className="mx-auto my-[40px] max-w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">

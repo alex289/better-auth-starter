@@ -47,7 +47,9 @@ export default function DeleteUserDialog({ userId }: { userId: string }) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+        <DropdownMenuItem
+          onSelect={(e) => e.preventDefault()}
+          className="cursor-pointer">
           <Trash className="mr-2 h-4 w-4" /> Delete user
         </DropdownMenuItem>
       </DialogTrigger>
