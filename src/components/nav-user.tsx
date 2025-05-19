@@ -20,6 +20,7 @@ import { authClient } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
 import { User } from 'better-auth';
 import {
+  Building,
   CircleUser,
   EllipsisVertical,
   Key,
@@ -108,6 +109,12 @@ export function NavUser({ user }: { user: User }) {
                 <Link href="/account/api-keys">
                   <Key />
                   API Keys
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/account/organizations">
+                  <Building />
+                  Organizations
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
