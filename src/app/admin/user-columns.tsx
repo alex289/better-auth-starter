@@ -31,34 +31,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-// const handleDeleteUser = async (id: string) => {
-//   setIsLoading(`delete-${id}`);
-//   try {
-//     await client.admin.removeUser({ userId: id });
-//     toast.success("User deleted successfully");
-//     queryClient.invalidateQueries({
-//       queryKey: ["users"],
-//     });
-//   } catch (error: any) {
-//     toast.error(error.message || "Failed to delete user");
-//   } finally {
-//     setIsLoading(undefined);
-//   }
-// };
-
-// const handleRevokeSessions = async (id: string) => {
-//   setIsLoading(`revoke-${id}`);
-//   try {
-//     await client.admin.revokeUserSessions({ userId: id });
-//     toast.success("Sessions revoked for user");
-//   } catch (error: any) {
-//     toast.error(error.message || "Failed to revoke sessions");
-//   } finally {
-//     setIsLoading(undefined);
-//   }
-// };
-
-export const columns: ColumnDef<UserWithRole>[] = [
+export const userColumns: ColumnDef<UserWithRole>[] = [
   {
     id: 'select',
     header: ({ table }) => (

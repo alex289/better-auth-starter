@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   boolean,
   index,
@@ -148,6 +149,13 @@ export const member = pgTable(
   (table) => [index().on(table.userId), index().on(table.organizationId)],
 );
 
+export const memberRelation = relations(member, ({ one }) => ({
+  user: one(user, {
+    fields: [member.userId],
+    references: [user.id],
+  }),
+}));
+
 export const invitation = pgTable(
   'invitation',
   {
@@ -165,3 +173,10 @@ export const invitation = pgTable(
   },
   (table) => [index().on(table.email), index().on(table.organizationId)],
 );
+
+export const invitationsRelation = relations(invitation, ({ one }) => ({
+  user: one(user, {
+    fields: [invitation.inviterId],
+    references: [user.id],
+  }),
+}));

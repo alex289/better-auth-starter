@@ -1,6 +1,6 @@
 import AdminNavbar from '@/components/admin-navbar';
-import CreateUserDialog from '@/components/dialogs/create-user-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getAllOrganizations } from '@/db/queries';
 import { auth } from '@/lib/auth';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -23,6 +23,8 @@ export default async function AdminPage() {
     redirect('/dashboard');
   }
 
+  const organizations = await getAllOrganizations();
+
   return (
     <>
       <AdminNavbar user={session.user} />
@@ -30,10 +32,9 @@ export default async function AdminPage() {
       <Card className="m-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">Admin Dashboard</CardTitle>
-          <CreateUserDialog />
         </CardHeader>
         <CardContent>
-          <AdminPageClient />
+          <AdminPageClient organizations={organizations} />
         </CardContent>
       </Card>
     </>
