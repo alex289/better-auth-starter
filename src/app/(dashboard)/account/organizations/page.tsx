@@ -75,7 +75,7 @@ export default function UserOrganisationSettingsContent() {
               </div>
 
               <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger>
+                <DialogTrigger asChild>
                   <Button
                     variant="outline"
                     className="text-destructive hover:text-destructive hover:bg-destructive/10">

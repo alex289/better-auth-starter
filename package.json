@@ -31,14 +31,14 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-email/components": "^0.0.41",
     "@tabler/icons-react": "^3.33.0",
-    "@tanstack/react-query": "^5.76.2",
+    "@tanstack/react-query": "^5.79.0",
     "@tanstack/react-table": "^8.21.3",
     "better-auth": "^1.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
-    "drizzle-orm": "^0.43.1",
+    "drizzle-orm": "^0.44.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
@@ -53,13 +53,13 @@
     "react-hook-form": "^7.56.4",
     "react-qr-code": "^2.0.15",
     "recharts": "^2.15.3",
-    "redis": "^5.1.0",
+    "redis": "^5.1.1",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "ua-parser-js": "^2.0.3",
     "vaul": "^1.1.2",
-    "zod": "^3.25.26"
+    "zod": "^3.25.36"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -78,7 +78,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.19.4",
     "typescript": "^5",
-    "typescript-eslint": "^8.32.1"
+    "typescript-eslint": "^8.33.0"
   },
   "packageManager": "pnpm@10.9.0"
 }

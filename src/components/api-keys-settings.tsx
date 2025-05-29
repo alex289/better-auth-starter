@@ -87,10 +87,9 @@ export function ApiKeysSettings({
       expiresIn:
         values.expiresIn === 'never' ? null : parseInt(values.expiresIn),
       prefix: 'bas_',
-      // TODO: Make this server action to use permissions
-      // permissions: {
-      //   projects: [values.permission],
-      // },
+      metadata: {
+        permission: values.permission,
+      },
     });
 
     setLoading(false);

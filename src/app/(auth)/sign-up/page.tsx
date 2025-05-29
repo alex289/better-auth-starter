@@ -186,7 +186,7 @@ export default function SignUpPage() {
                     <div className="flex cursor-pointer items-center gap-2">
                       <Input
                         type="file"
-                        accept="image/*"
+                        accept="image/png, image/jpeg"
                         className="w-full"
                         onChange={async (e) =>
                           field.onChange(await handleImageChange(e))

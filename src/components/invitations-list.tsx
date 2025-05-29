@@ -40,12 +40,12 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Spinner } from './spinner';
 
-// TOOD: Only admins should invite and edit
-
 export function InvitationsList({
   invitations,
+  activeUserRole,
 }: {
   invitations: FullOrganizationInvitation[];
+  activeUserRole: string;
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +143,10 @@ export function InvitationsList({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={activeUserRole === 'member'}>
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Open menu</span>
                         </Button>

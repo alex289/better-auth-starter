@@ -47,8 +47,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Spinner } from './spinner';
 
-// TODO: Edit own role?
-
 export function MembersList({
   members,
   activeUserRole,
@@ -140,12 +138,18 @@ export function MembersList({
                         value as 'owner' | 'admin' | 'member',
                       )
                     }
-                    disabled={member.role === 'owner'}>
+                    disabled={
+                      member.role === 'owner' || activeUserRole === 'member'
+                    }>
                     <SelectTrigger className="w-[110px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem
+                        value="owner"
+                        disabled={activeUserRole !== 'owner'}>
+                        Owner
+                      </SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="member">Member</SelectItem>
                     </SelectContent>
@@ -153,64 +157,68 @@ export function MembersList({
                 </TableCell>
                 <TableCell>{member.createdAt.toLocaleDateString()}</TableCell>
                 <TableCell>
-                  {activeUserRole !== 'member' && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <Dialog
-                          open={isRemoveDialogOpen}
-                          onOpenChange={setIsRemoveDialogOpen}>
-                          <DialogTrigger asChild>
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              onSelect={(e) => e.preventDefault()}>
-                              <UserMinus className="mr-2 h-4 w-4" />
-                              Remove member
-                            </DropdownMenuItem>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Remove Member</DialogTitle>
-                              <DialogDescription>
-                                Are you sure you want to remove this member from
-                                the organization?
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="py-4">
-                              <p className="font-medium">{member.user.name}</p>
-                              <p className="text-muted-foreground text-sm">
-                                {member.user.email}
-                              </p>
-                            </div>
-                            <DialogFooter>
-                              <Button
-                                variant="outline"
-                                disabled={isLoading}
-                                onClick={() => setIsRemoveDialogOpen(false)}>
-                                Cancel
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                disabled={isLoading}
-                                onClick={async () =>
-                                  await removeMember(member)
-                                }>
-                                {isLoading ? (
-                                  <Spinner className="text-white dark:text-black" />
-                                ) : null}
-                                Remove Member
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                  {activeUserRole !== 'member' &&
+                    member.role === 'owner' &&
+                    activeUserRole === 'owner' && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Dialog
+                            open={isRemoveDialogOpen}
+                            onOpenChange={setIsRemoveDialogOpen}>
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onSelect={(e) => e.preventDefault()}>
+                                <UserMinus className="mr-2 h-4 w-4" />
+                                Remove member
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Remove Member</DialogTitle>
+                                <DialogDescription>
+                                  Are you sure you want to remove this member
+                                  from the organization?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <p className="font-medium">
+                                  {member.user.name}
+                                </p>
+                                <p className="text-muted-foreground text-sm">
+                                  {member.user.email}
+                                </p>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  disabled={isLoading}
+                                  onClick={() => setIsRemoveDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  disabled={isLoading}
+                                  onClick={async () =>
+                                    await removeMember(member)
+                                  }>
+                                  {isLoading ? (
+                                    <Spinner className="text-white dark:text-black" />
+                                  ) : null}
+                                  Remove Member
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                 </TableCell>
               </TableRow>
             ))}

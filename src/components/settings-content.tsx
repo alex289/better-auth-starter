@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
-import { convertImageToBase64 } from '@/lib/utils';
+import { convertImageToBase64, getInitials } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User } from 'better-auth';
 import { X } from 'lucide-react';
@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Spinner } from './spinner';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   Form,
   FormControl,
@@ -116,10 +117,24 @@ export function SettingsContent({ user }: { user: User }) {
                     <FormLabel>Profile image (optional)</FormLabel>
                     <FormControl>
                       <div className="flex cursor-pointer items-center gap-2">
+                        <Avatar className="mr-5 h-10 w-10 cursor-default">
+                          <AvatarImage
+                            src={
+                              form.getValues().image &&
+                              form.getValues().image.length > 0
+                                ? form.getValues().image
+                                : undefined
+                            }
+                            alt={form.getValues().name}
+                          />
+                          <AvatarFallback>
+                            {getInitials(form.getValues().name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <Input
                           type="file"
-                          accept="image/*"
-                          className="w-full"
+                          accept="image/png, image/jpeg"
+                          className="w-75 cursor-pointer"
                           onChange={async (e) =>
                             field.onChange(await handleImageChange(e))
                           }

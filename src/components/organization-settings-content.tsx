@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/auth-client';
 import { FullOrganization } from '@/lib/types';
+import { getInitials } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -34,6 +35,7 @@ import InviteMemberDialog from './dialogs/invite-member-dialog';
 import { InvitationsList } from './invitations-list';
 import { MembersList } from './members-list';
 import { Spinner } from './spinner';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   Form,
   FormControl,
@@ -47,8 +49,6 @@ const updateOrganisationSchema = z.object({
   name: z.string().min(2).max(50),
   logo: z.string().max(255).optional(),
 });
-
-// TODO: only admins should edit
 
 export function OrganizationSettingsContent({
   organization,
@@ -153,7 +153,13 @@ export function OrganizationSettingsContent({
                       <FormItem className="grid gap-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="My Organization" {...field} />
+                          <Input
+                            placeholder="My Organization"
+                            disabled={
+                              field.disabled || activeUserRole === 'member'
+                            }
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -166,10 +172,24 @@ export function OrganizationSettingsContent({
                       <FormItem className="grid gap-1">
                         <FormLabel>Logo</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="https://example.com/logo.png"
-                            {...field}
-                          />
+                          <div className="mt-2 flex items-center gap-2">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage
+                                src={form.getValues().logo ?? undefined}
+                                alt={form.getValues().name}
+                              />
+                              <AvatarFallback>
+                                {getInitials(form.getValues().name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <Input
+                              placeholder="https://example.com/logo.png"
+                              disabled={
+                                field.disabled || activeUserRole === 'member'
+                              }
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -204,7 +224,9 @@ export function OrganizationSettingsContent({
                 open={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="destructive">
+                  <Button
+                    variant="destructive"
+                    disabled={activeUserRole === 'member'}>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete Organization
                   </Button>
@@ -262,8 +284,14 @@ export function OrganizationSettingsContent({
 
         <TabsContent value="invitations">
           <div className="space-y-6">
-            <InviteMemberDialog organizationId={organization.id} />
-            <InvitationsList invitations={organization.invitations} />
+            <InviteMemberDialog
+              organizationId={organization.id}
+              activeUserRole={activeUserRole}
+            />
+            <InvitationsList
+              invitations={organization.invitations}
+              activeUserRole={activeUserRole}
+            />
           </div>
         </TabsContent>
       </Tabs>

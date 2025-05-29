@@ -36,14 +36,15 @@ import {
 
 const inviteMemberSchemaSchema = z.object({
   email: z.string().email(),
-  // TODO: Add constants for roles
   role: z.enum(['admin', 'member']),
 });
 
 export default function InviteMemberDialog({
   organizationId,
+  activeUserRole,
 }: {
   organizationId: string;
+  activeUserRole: string;
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +84,7 @@ export default function InviteMemberDialog({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={activeUserRole === 'member'}>
           <Send className="mr-2 h-4 w-4" /> Invite Member
         </Button>
       </DialogTrigger>
