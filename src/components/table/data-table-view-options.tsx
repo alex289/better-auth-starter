@@ -1,8 +1,8 @@
 'use client';
 
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Table } from '@tanstack/react-table';
 import { Settings2 } from 'lucide-react';
+import { DropdownMenu as RadixDropdownMenu } from 'radix-ui';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,7 @@ export function DataTableViewOptions<TData>({
 }: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <RadixDropdownMenu.Trigger asChild>
         <Button
           variant="outline"
           size="sm"
@@ -30,7 +30,7 @@ export function DataTableViewOptions<TData>({
           <Settings2 />
           View
         </Button>
-      </DropdownMenuTrigger>
+      </RadixDropdownMenu.Trigger>
       <DropdownMenuContent align="end" className="w-[150px]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />

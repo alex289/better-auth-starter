@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { authClient } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
-import { DialogTrigger } from '@radix-ui/react-dialog';
 import { AlertCircle } from 'lucide-react';
+import { Dialog as RadixDialog } from 'radix-ui';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -75,13 +75,13 @@ export default function UserOrganisationSettingsContent() {
               </div>
 
               <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
+                <RadixDialog.Trigger asChild>
                   <Button
                     variant="outline"
                     className="text-destructive hover:text-destructive hover:bg-destructive/10">
                     Leave
                   </Button>
-                </DialogTrigger>
+                </RadixDialog.Trigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
