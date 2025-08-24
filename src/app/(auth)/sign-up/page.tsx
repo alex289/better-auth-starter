@@ -34,7 +34,7 @@ import { convertImageToBase64 } from '@/lib/utils';
 const signUpSchema = z
   .object({
     name: z.string().min(2),
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().min(8),
     confirmPassword: z.string().min(8),
     image: z.string(),

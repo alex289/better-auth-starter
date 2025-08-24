@@ -33,7 +33,7 @@ import {
 
 const userSettingsSchema = z.object({
   name: z.string().min(2),
-  email: z.string().email(),
+  email: z.email(),
   image: z.string(),
 });
 

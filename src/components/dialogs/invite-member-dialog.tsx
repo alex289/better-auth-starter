@@ -35,7 +35,7 @@ import {
 } from '../ui/select';
 
 const inviteMemberSchemaSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   role: z.enum(['admin', 'member']),
 });
 

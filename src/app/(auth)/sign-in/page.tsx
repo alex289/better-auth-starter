@@ -42,13 +42,13 @@ import { Separator } from '@/components/ui/separator';
 import { authClient } from '@/lib/auth-client';
 
 const signInSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   rememberMe: z.boolean(),
 });
 
 const resetPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 function ForgotPasswordDialog({ captchaToken }: { captchaToken: string }) {
