@@ -54,7 +54,7 @@ export default async function Home() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/docs">
+                <Link href="#documentation">
                   <Button variant="outline">Documentation</Button>
                 </Link>
               </div>

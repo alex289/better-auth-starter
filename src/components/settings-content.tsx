@@ -37,7 +37,6 @@ const userSettingsSchema = z.object({
   image: z.string(),
 });
 
-// TODO: Display image state
 export function SettingsContent({ user }: { user: User }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

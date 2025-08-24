@@ -16,9 +16,7 @@ import { redirect } from 'next/navigation';
 
 export default async function Page({
   params,
-}: {
-  params: Promise<{ invitationId: string }>;
-}) {
+}: PageProps<'/accept-invitation/[invitationId]'>) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });

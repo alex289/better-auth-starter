@@ -1,12 +1,6 @@
 import { db } from '@/db';
 import { user } from '@/db/schema';
-import {
-  checkout,
-  polar,
-  portal,
-  usage,
-  webhooks,
-} from '@polar-sh/better-auth';
+import { checkout, polar, portal, usage } from '@polar-sh/better-auth';
 import { Polar } from '@polar-sh/sdk';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -42,6 +36,7 @@ const polarClient = new Polar({
 
 export const auth = betterAuth({
   appName: 'Better Auth Starter',
+  telemetry: { enabled: false },
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
@@ -111,7 +106,7 @@ export const auth = betterAuth({
         checkout({
           products: [
             {
-              productId: '123-456-789',
+              productId: process.env.POLAR_PRODUCT_ID as string,
               slug: 'pro',
             },
           ],
@@ -120,9 +115,6 @@ export const auth = betterAuth({
         }),
         portal(),
         usage(),
-        webhooks({
-          secret: process.env.POLAR_WEBHOOK_SECRET as string,
-        }),
       ],
     }),
   ],
