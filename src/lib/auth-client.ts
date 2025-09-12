@@ -2,6 +2,7 @@ import { polarClient } from '@polar-sh/better-auth';
 import {
   adminClient,
   apiKeyClient,
+  lastLoginMethodClient,
   organizationClient,
   passkeyClient,
   twoFactorClient,
@@ -16,6 +17,7 @@ export const authClient = createAuthClient({
     adminClient(),
     organizationClient(),
     polarClient(),
+    lastLoginMethodClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
         window.location.href = '/two-factor';

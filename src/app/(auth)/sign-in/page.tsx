@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 import Captcha from '@/components/captcha';
 import { Spinner } from '@/components/spinner';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -139,6 +140,7 @@ export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<'passkey' | 'password' | null>(null);
   const [captchaToken, setCaptchaToken] = useState('');
+  const lastMethod = authClient.getLastUsedLoginMethod();
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -252,18 +254,26 @@ export default function SignInPage() {
             />
 
             <div className="flex flex-col gap-4">
-              <Button type="submit" disabled={loading === 'password'}>
+              <Button
+                type="submit"
+                variant={lastMethod === 'email' ? 'default' : 'outline'}
+                disabled={loading === 'password'}>
                 {loading === 'password' ? (
                   <Spinner className="text-white dark:text-black" />
                 ) : null}
                 Sign-in
+                {lastMethod === 'email' && (
+                  <Badge className="ml-2" variant="secondary">
+                    Last used
+                  </Badge>
+                )}
               </Button>
 
               <Separator className="my-4" />
 
               <Button
-                variant="outline"
                 type="button"
+                variant={lastMethod === 'passkey' ? 'default' : 'outline'}
                 className="gap-2"
                 disabled={loading === 'passkey'}
                 onClick={async () => await passkeySignIn()}>
@@ -273,10 +283,15 @@ export default function SignInPage() {
                   <Key className="mr-2 h-4 w-4" />
                 )}
                 Sign-in with Passkey
+                {lastMethod === 'passkey' && (
+                  <Badge className="ml-2" variant="secondary">
+                    Last used
+                  </Badge>
+                )}
               </Button>
 
               <Button
-                variant="outline"
+                variant={lastMethod === 'github' ? 'default' : 'outline'}
                 type="button"
                 className="gap-2"
                 onClick={async () =>
@@ -308,9 +323,14 @@ export default function SignInPage() {
                   </defs>
                 </svg>
                 Sign in with GitHub
+                {lastMethod === 'github' && (
+                  <Badge className="ml-2" variant="secondary">
+                    Last used
+                  </Badge>
+                )}
               </Button>
               <Button
-                variant="outline"
+                variant={lastMethod === 'google' ? 'default' : 'outline'}
                 type="button"
                 className="gap-2"
                 onClick={async () =>
@@ -345,6 +365,11 @@ export default function SignInPage() {
                   </defs>
                 </svg>
                 Sign in with Google
+                {lastMethod === 'google' && (
+                  <Badge className="ml-2" variant="secondary">
+                    Last used
+                  </Badge>
+                )}
               </Button>
             </div>
           </form>

@@ -9,6 +9,7 @@ import {
   apiKey,
   captcha,
   haveIBeenPwned,
+  lastLoginMethod,
   organization,
   twoFactor,
 } from 'better-auth/plugins';
@@ -65,6 +66,7 @@ export const auth = betterAuth({
   plugins: [
     passkey(),
     haveIBeenPwned(),
+    lastLoginMethod(),
     apiKey(),
     twoFactor({
       otpOptions: {

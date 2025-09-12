@@ -45,7 +45,8 @@ export function NavMain({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
-                <Link href={new URL(item.url)}>
+                {/* @ts-expect-error Cant type this link */}
+                <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
