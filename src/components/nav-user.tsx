@@ -22,6 +22,7 @@ import { User } from 'better-auth';
 import {
   Building,
   CircleUser,
+  CreditCard,
   EllipsisVertical,
   Key,
   LogOut,
@@ -115,6 +116,12 @@ export function NavUser({ user }: { user: User }) {
                 <Link href="/account/organizations">
                   <Building />
                   Organizations
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/account/billing">
+                  <CreditCard />
+                  Billing
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

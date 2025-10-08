@@ -42,12 +42,22 @@ export default function AdminNavbar({ user }: { user: User }) {
   }
   return (
     <nav className="flex items-center justify-between border-b px-4 py-3">
-      <Button variant="ghost" size="sm" asChild className="gap-2">
-        <Link href="/dashboard">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" asChild className="gap-2">
+          <Link href="/dashboard">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/admin">Admin</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/admin/orders">Orders</Link>
+          </Button>
+        </div>
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="lg" variant="ghost">
