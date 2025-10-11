@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { user } from '@/db/schema';
-import { checkout, polar, portal, usage } from '@polar-sh/better-auth';
+import { checkout, polar, portal } from '@polar-sh/better-auth';
 import { Polar } from '@polar-sh/sdk';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -116,7 +116,6 @@ export const auth = betterAuth({
           authenticatedUsersOnly: true,
         }),
         portal(),
-        usage(),
       ],
     }),
   ],
