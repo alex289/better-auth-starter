@@ -11,26 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CustomerOrder } from '@polar-sh/sdk/models/components/customerorder.js';
 import { ColumnDef } from '@tanstack/react-table';
 import { formatDistanceToNow } from 'date-fns';
 import { ClipboardCopy, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 
-export interface Order {
-  id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  customerEmail?: string;
-  productName?: string;
-  createdAt: string;
-  user?: {
-    id: string;
-    email: string;
-  };
-}
-
-export const orderColumns: ColumnDef<Order>[] = [
+export const orderColumns: ColumnDef<CustomerOrder>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
@@ -47,7 +34,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       <DataTableColumnHeader column={column} title="Customer" />
     ),
     cell: ({ row }) => {
-      const email = row.original.customerEmail || row.original.user?.email;
+      const email = row.original.customerId;
       return <span>{email || 'N/A'}</span>;
     },
   },
@@ -57,7 +44,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       <DataTableColumnHeader column={column} title="Product" />
     ),
     cell: ({ row }) => {
-      const productName = row.original.productName;
+      const productName = row.original.product.name;
       return <span>{productName || 'N/A'}</span>;
     },
   },
@@ -67,7 +54,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       <DataTableColumnHeader column={column} title="Amount" />
     ),
     cell: ({ row }) => {
-      const amount = row.original.amount;
+      const amount = row.original.totalAmount;
       const currency = row.original.currency || 'USD';
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -86,7 +73,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       return (
         <Badge
           variant={
-            status === 'succeeded' || status === 'paid'
+            status === 'paid'
               ? 'default'
               : status === 'pending'
                 ? 'secondary'
@@ -135,18 +122,18 @@ export const orderColumns: ColumnDef<Order>[] = [
               <ClipboardCopy className="mr-2 h-4 w-4" />
               Copy order ID
             </DropdownMenuItem>
-            {order.user?.id && (
+            {order.customerId && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => {
-                    if (order.user?.id) {
-                      navigator.clipboard.writeText(order.user.id);
-                      toast('Copied user ID to clipboard');
+                    if (order.customerId) {
+                      navigator.clipboard.writeText(order.customerId);
+                      toast('Copied customer ID to clipboard');
                     }
                   }}>
                   <ClipboardCopy className="mr-2 h-4 w-4" />
-                  Copy user ID
+                  Copy customer ID
                 </DropdownMenuItem>
               </>
             )}

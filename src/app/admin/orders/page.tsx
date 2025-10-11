@@ -1,5 +1,5 @@
+import { OrdersContent } from '@/app/admin/orders/orders-content';
 import AdminNavbar from '@/components/admin-navbar';
-import { OrdersContent } from '@/components/orders-content';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import { Metadata } from 'next';

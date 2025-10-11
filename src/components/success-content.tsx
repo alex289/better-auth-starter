@@ -45,7 +45,7 @@ export function SuccessContent({ checkoutId }: { checkoutId?: string }) {
           </Alert>
 
           {checkoutId && (
-            <div className="text-muted-foreground rounded-md bg-muted p-3 text-sm">
+            <div className="text-muted-foreground bg-muted rounded-md p-3 text-sm">
               <p className="font-medium">Checkout ID:</p>
               <p className="font-mono text-xs">{checkoutId}</p>
             </div>

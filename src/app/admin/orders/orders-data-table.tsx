@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  Order,
-  orderColumns,
-} from '@/components/orders-columns';
+import { orderColumns } from '@/app/admin/orders/orders-columns';
 import {
   ColumnFiltersState,
   SortingState,
@@ -18,7 +15,6 @@ import {
 import * as React from 'react';
 
 import { DataTablePagination } from '@/components/table/data-table-pagination';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -28,9 +24,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { CustomerOrder } from '@polar-sh/sdk/models/components/customerorder.js';
+import { DataTableViewOptions } from '../../../components/table/data-table-view-options';
 
 interface OrdersDataTableProps {
-  data: Order[];
+  data: CustomerOrder[];
 }
 
 export function OrdersDataTable({ data }: OrdersDataTableProps) {
@@ -71,14 +69,7 @@ export function OrdersDataTable({ data }: OrdersDataTableProps) {
           }
           className="max-w-sm"
         />
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.location.reload()}>
-            Refresh
-          </Button>
-        </div>
+        <DataTableViewOptions table={table} />
       </div>
       <div className="rounded-md border">
         <Table>

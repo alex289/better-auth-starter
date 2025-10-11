@@ -12,68 +12,44 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { authClient } from '@/lib/auth-client';
+import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertCircle, CreditCard, Package, Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { AlertCircle, CreditCard, Package } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Spinner } from './spinner';
-
-interface Subscription {
-  id: string;
-  status: string;
-  product?: {
-    name: string;
-  };
-  currentPeriodEnd?: string;
-}
-
-interface Usage {
-  requests?: number;
-}
 
 export function BillingContent() {
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [usage, setUsage] = useState<Usage | null>(null);
 
-  useEffect(() => {
-    loadSubscriptions();
-    loadUsage();
-  }, []);
+  const { data: subscriptions } = useQuery({
+    queryKey: ['subscriptions'],
+    queryFn: async () => {
+      try {
+        const { data: subs } = await authClient.customer.subscriptions.list({
+          query: {
+            page: 1,
+            limit: 10,
+            active: true,
+          },
+        });
 
-  async function loadSubscriptions() {
-    try {
-      const response = await fetch('/api/auth/polar/subscriptions');
-      if (response.ok) {
-        const data = await response.json();
-        setSubscriptions(data.result?.items || []);
+        return subs?.result.items || [];
+      } catch {
+        console.error('Failed to load subscriptions');
       }
-    } catch {
-      console.error('Failed to load subscriptions');
-    }
-  }
-
-  async function loadUsage() {
-    try {
-      const response = await fetch('/api/auth/polar/usage');
-      if (response.ok) {
-        const data = await response.json();
-        setUsage(data);
-      }
-    } catch {
-      console.error('Failed to load usage');
-    }
-  }
+    },
+  });
 
   async function handleCheckout() {
     setLoading(true);
     try {
-      const res = await authClient.polar.checkout({
+      const res = await authClient.checkout({
         slug: 'pro',
       });
 
-      if ('error' in res && res.error) {
+      if (res.error) {
         toast.error('Failed to start checkout', {
           description: res.error.message,
         });
@@ -81,9 +57,8 @@ export function BillingContent() {
         return;
       }
 
-      // If redirect is true, the user will be redirected to the checkout page
-      if ('url' in res && res.url) {
-        window.location.href = res.url;
+      if (res.data.url) {
+        window.location.href = res.data.url;
       }
     } catch {
       toast.error('Failed to start checkout');
@@ -94,14 +69,18 @@ export function BillingContent() {
   async function handlePortal() {
     setPortalLoading(true);
     try {
-      const response = await fetch('/api/auth/polar/portal');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.url) {
-          window.location.href = data.url;
-        }
-      } else {
-        toast.error('Failed to open portal');
+      const response = await authClient.customer.portal();
+
+      if (response.error) {
+        toast.error('Failed to open portal', {
+          description: response.error.message,
+        });
+        setPortalLoading(false);
+        return;
+      }
+
+      if (response.data?.url) {
+        window.location.href = response.data.url;
       }
     } catch {
       toast.error('Failed to open portal');
@@ -110,7 +89,7 @@ export function BillingContent() {
     }
   }
 
-  const hasActiveSubscription = subscriptions.some(
+  const hasActiveSubscription = subscriptions?.some(
     (sub) => sub.status === 'active' || sub.status === 'trialing',
   );
 
@@ -123,7 +102,6 @@ export function BillingContent() {
         </p>
       </div>
 
-      {/* Subscription Status */}
       <Card>
         <CardHeader>
           <CardTitle>Subscription Status</CardTitle>
@@ -151,7 +129,7 @@ export function BillingContent() {
             </Alert>
           )}
 
-          {subscriptions.length > 0 && (
+          {subscriptions && subscriptions.length > 0 && (
             <div className="space-y-3">
               {subscriptions.map((subscription) => (
                 <div
@@ -211,31 +189,6 @@ export function BillingContent() {
           )}
         </CardFooter>
       </Card>
-
-      {/* Usage Information */}
-      {usage && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Usage</CardTitle>
-            <CardDescription>
-              Your current usage metrics for this billing period.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="bg-primary/10 rounded-full p-2">
-                <Zap className="text-primary h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">API Requests</h3>
-                <p className="text-muted-foreground text-sm">
-                  {usage.requests || 0} requests this period
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
