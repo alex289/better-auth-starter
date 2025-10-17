@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { user } from '@/db/schema';
+import { member, organization, user } from '@/db/schema';
 import { checkout, polar, portal } from '@polar-sh/better-auth';
 import { Polar } from '@polar-sh/sdk';
 import { betterAuth } from 'better-auth';
@@ -10,7 +10,7 @@ import {
   captcha,
   haveIBeenPwned,
   lastLoginMethod,
-  organization,
+  organization as organizationPlugin,
   twoFactor,
 } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
@@ -80,7 +80,7 @@ export const auth = betterAuth({
       provider: 'google-recaptcha',
       secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY as string,
     }),
-    organization({
+    organizationPlugin({
       sendInvitationEmail: async (data) => {
         const invitedUser = await db.query.user.findFirst({
           where: eq(user.email, data.email),
@@ -164,6 +164,32 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       await verifyEmail(user.email, user.name, url);
+    },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const memberUser = await db.query.member.findFirst({
+            where: eq(member.id, session.userId),
+          });
+
+          if (!memberUser) {
+            return { data: session };
+          }
+
+          const activeOrganization = await db.query.organization.findFirst({
+            where: eq(organization.id, memberUser.organizationId),
+          });
+
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: activeOrganization?.id,
+            },
+          };
+        },
+      },
     },
   },
 });
