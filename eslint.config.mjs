@@ -1,15 +1,11 @@
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
+import nextVitals from 'eslint-config-next/core-web-vitals';
 import { dirname } from 'path';
 import tseslint from 'typescript-eslint';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
 
 const eslintConfig = [
   {
@@ -21,7 +17,7 @@ const eslintConfig = [
       'next-env.d.ts',
     ],
   },
-  ...compat.extends('next/core-web-vitals'),
+  ...nextVitals,
   js.configs.recommended,
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
