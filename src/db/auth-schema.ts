@@ -8,24 +8,23 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-export const user = pgTable(
-  'user',
-  {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    email: text('email').notNull().unique(),
-    emailVerified: boolean('email_verified').notNull(),
-    image: text('image'),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').notNull(),
-    twoFactorEnabled: boolean('two_factor_enabled'),
-    role: text('role'),
-    banned: boolean('banned'),
-    banReason: text('ban_reason'),
-    banExpires: timestamp('ban_expires'),
-  },
-  (table) => [index().on(table.email)],
-);
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image: text('image'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  twoFactorEnabled: boolean('two_factor_enabled').default(false),
+  role: text('role'),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires'),
+});
 
 export const account = pgTable(
   'account',
@@ -43,10 +42,12 @@ export const account = pgTable(
     refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     scope: text('scope'),
     password: text('password'),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
-  (table) => [index().on(table.userId)],
+  (table) => [index('account_userId_idx').on(table.userId)],
 );
 
 export const verification = pgTable(
@@ -56,10 +57,13 @@ export const verification = pgTable(
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at'),
-    updatedAt: timestamp('updated_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
-  (table) => [index().on(table.identifier)],
+  (table) => [index('verification_identifier_idx').on(table.identifier)],
 );
 
 export const passkey = pgTable(
@@ -71,41 +75,52 @@ export const passkey = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    credentialID: text('credential_i_d').notNull(),
+    credentialID: text('credential_id').notNull(),
     counter: integer('counter').notNull(),
     deviceType: text('device_type').notNull(),
     backedUp: boolean('backed_up').notNull(),
     transports: text('transports'),
     createdAt: timestamp('created_at'),
+    aaguid: text('aaguid'),
   },
-  (table) => [index().on(table.userId)],
+  (table) => [
+    index('passkey_userId_idx').on(table.userId),
+    index('passkey_credentialID_idx').on(table.credentialID),
+  ],
 );
 
-export const apikey = pgTable('apikey', {
-  id: text('id').primaryKey(),
-  name: text('name'),
-  start: text('start'),
-  prefix: text('prefix'),
-  key: text('key').notNull(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  refillInterval: integer('refill_interval'),
-  refillAmount: integer('refill_amount'),
-  lastRefillAt: timestamp('last_refill_at'),
-  enabled: boolean('enabled'),
-  rateLimitEnabled: boolean('rate_limit_enabled'),
-  rateLimitTimeWindow: integer('rate_limit_time_window'),
-  rateLimitMax: integer('rate_limit_max'),
-  requestCount: integer('request_count'),
-  remaining: integer('remaining'),
-  lastRequest: timestamp('last_request'),
-  expiresAt: timestamp('expires_at'),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
-  permissions: text('permissions'),
-  metadata: text('metadata'),
-});
+export const apikey = pgTable(
+  'apikey',
+  {
+    id: text('id').primaryKey(),
+    name: text('name'),
+    start: text('start'),
+    prefix: text('prefix'),
+    key: text('key').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    refillInterval: integer('refill_interval'),
+    refillAmount: integer('refill_amount'),
+    lastRefillAt: timestamp('last_refill_at'),
+    enabled: boolean('enabled').default(true),
+    rateLimitEnabled: boolean('rate_limit_enabled').default(true),
+    rateLimitTimeWindow: integer('rate_limit_time_window').default(86400000),
+    rateLimitMax: integer('rate_limit_max').default(10),
+    requestCount: integer('request_count').default(0),
+    remaining: integer('remaining'),
+    lastRequest: timestamp('last_request'),
+    expiresAt: timestamp('expires_at'),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    permissions: text('permissions'),
+    metadata: text('metadata'),
+  },
+  (table) => [
+    index('apikey_key_idx').on(table.key),
+    index('apikey_userId_idx').on(table.userId),
+  ],
+);
 
 export const twoFactor = pgTable(
   'two_factor',
@@ -117,21 +132,20 @@ export const twoFactor = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
   },
-  (table) => [index().on(table.secret)],
+  (table) => [
+    index('twoFactor_secret_idx').on(table.secret),
+    index('twoFactor_userId_idx').on(table.userId),
+  ],
 );
 
-export const organization = pgTable(
-  'organization',
-  {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    slug: text('slug').unique(),
-    logo: text('logo'),
-    createdAt: timestamp('created_at').notNull(),
-    metadata: text('metadata'),
-  },
-  (table) => [index().on(table.slug)],
-);
+export const organization = pgTable('organization', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  logo: text('logo'),
+  createdAt: timestamp('created_at').notNull(),
+  metadata: text('metadata'),
+});
 
 export const member = pgTable(
   'member',
@@ -143,18 +157,14 @@ export const member = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    role: text('role').notNull(),
+    role: text('role').default('member').notNull(),
     createdAt: timestamp('created_at').notNull(),
   },
-  (table) => [index().on(table.userId), index().on(table.organizationId)],
+  (table) => [
+    index('member_organizationId_idx').on(table.organizationId),
+    index('member_userId_idx').on(table.userId),
+  ],
 );
-
-export const memberRelation = relations(member, ({ one }) => ({
-  user: one(user, {
-    fields: [member.userId],
-    references: [user.id],
-  }),
-}));
 
 export const invitation = pgTable(
   'invitation',
@@ -165,16 +175,77 @@ export const invitation = pgTable(
       .references(() => organization.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
     role: text('role'),
-    status: text('status').notNull(),
+    status: text('status').default('pending').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
     inviterId: text('inviter_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
   },
-  (table) => [index().on(table.email), index().on(table.organizationId)],
+  (table) => [
+    index('invitation_organizationId_idx').on(table.organizationId),
+    index('invitation_email_idx').on(table.email),
+  ],
 );
 
-export const invitationsRelation = relations(invitation, ({ one }) => ({
+export const userRelations = relations(user, ({ many }) => ({
+  accounts: many(account),
+  passkeys: many(passkey),
+  apikeys: many(apikey),
+  twoFactors: many(twoFactor),
+  members: many(member),
+  invitations: many(invitation),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
+
+export const passkeyRelations = relations(passkey, ({ one }) => ({
+  user: one(user, {
+    fields: [passkey.userId],
+    references: [user.id],
+  }),
+}));
+
+export const apikeyRelations = relations(apikey, ({ one }) => ({
+  user: one(user, {
+    fields: [apikey.userId],
+    references: [user.id],
+  }),
+}));
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
+    references: [user.id],
+  }),
+}));
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+  members: many(member),
+  invitations: many(invitation),
+}));
+
+export const memberRelations = relations(member, ({ one }) => ({
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id],
+  }),
+  user: one(user, {
+    fields: [member.userId],
+    references: [user.id],
+  }),
+}));
+
+export const invitationRelations = relations(invitation, ({ one }) => ({
+  organization: one(organization, {
+    fields: [invitation.organizationId],
+    references: [organization.id],
+  }),
   user: one(user, {
     fields: [invitation.inviterId],
     references: [user.id],

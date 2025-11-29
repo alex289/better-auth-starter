@@ -39,6 +39,7 @@ export function OrdersDataTable({ data }: OrdersDataTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns: orderColumns,

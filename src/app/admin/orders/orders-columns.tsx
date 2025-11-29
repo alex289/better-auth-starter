@@ -44,7 +44,7 @@ export const orderColumns: ColumnDef<CustomerOrder>[] = [
       <DataTableColumnHeader column={column} title="Product" />
     ),
     cell: ({ row }) => {
-      const productName = row.original.product.name;
+      const productName = row.original.product?.name;
       return <span>{productName || 'N/A'}</span>;
     },
   },

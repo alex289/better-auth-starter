@@ -63,7 +63,7 @@ function ForgotPasswordDialog({ captchaToken }: { captchaToken: string }) {
 
   async function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
     setLoading(true);
-    const { error } = await authClient.forgetPassword({
+    const { error } = await authClient.requestPasswordReset({
       email: values.email,
       redirectTo: '/reset-password',
       fetchOptions: {

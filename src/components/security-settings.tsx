@@ -14,9 +14,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/auth-client';
+import { Passkey } from '@better-auth/passkey';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Session } from 'better-auth';
-import { Passkey } from 'better-auth/plugins/passkey';
 import { formatDistanceToNow } from 'date-fns';
 import {
   AlertCircle,

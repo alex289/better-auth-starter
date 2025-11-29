@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/data/postgres
 
   redis:
     container_name: redis

@@ -1,9 +1,10 @@
 import { db } from '@/db';
 import { member, organization, user } from '@/db/schema';
+import { passkey } from '@better-auth/passkey';
 import { checkout, polar, portal } from '@polar-sh/better-auth';
 import { Polar } from '@polar-sh/sdk';
-import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { betterAuth } from 'better-auth/minimal';
 import {
   admin,
   apiKey,
@@ -13,7 +14,6 @@ import {
   organization as organizationPlugin,
   twoFactor,
 } from 'better-auth/plugins';
-import { passkey } from 'better-auth/plugins/passkey';
 import { eq } from 'drizzle-orm';
 import { createClient } from 'redis';
 import {
@@ -41,6 +41,9 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
+  experimental: {
+    joins: true,
+  },
   secondaryStorage: {
     get: async (key) => {
       const value = await redis.get(key);
@@ -147,7 +150,7 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
         await changeEmail(newEmail, user.name, url);
       },
     },
